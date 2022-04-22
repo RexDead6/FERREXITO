@@ -83,7 +83,7 @@ public final class DATA_BASE {
         con = null;
         
         File data = new File("data/DATA_SYSTEM.db");
-        boolean a = data.delete();
+        data.delete();
                 
         OPEN_DB();
         

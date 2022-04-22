@@ -204,4 +204,4 @@ def generarReporte():
 
 # ======================== LLAMAR FUNCIÓN ==========================
 
-generarReporte()
+#generarReporte()

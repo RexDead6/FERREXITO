@@ -10,6 +10,7 @@ class Dialog_cliente(QtWidgets.QDialog):
         self.create_widgets()
 
         self.msgBox = QMessageBox()
+        self.txt_nombre.setFocus()
 
     def register_user(self):
         if self.txt_ci.text() == "" or self.txt_nombre.text() == "":
@@ -22,6 +23,17 @@ class Dialog_cliente(QtWidgets.QDialog):
             self.mainApp.frame_facturacion.txt_nombre.setText(self.txt_nombre.text())
             self.mainApp.frame_facturacion.txt_barcode.setFocus()
             self.hide()
+
+    def closeEvent(self, event):
+        print("CLOSE EVENT")
+        self.mainApp.frame_facturacion.txt_ci.setText("")
+        self.mainApp.frame_facturacion.txt_ci.setFocus()
+
+    def keyPressEvent(self, event):
+        if event.key() == QtCore.Qt.Key_Escape:
+            self.close()
+            self.mainApp.frame_facturacion.txt_ci.setText("")
+            self.mainApp.frame_facturacion.txt_ci.setFocus()
 
     def create_widgets(self):
         self.setWindowTitle("REGISTRO CLIENTE")
@@ -47,6 +59,7 @@ class Dialog_cliente(QtWidgets.QDialog):
 
         self.txt_ci = QtWidgets.QLineEdit(self.mainApp.frame_facturacion.txt_ci.text())
         self.txt_ci.setFont(self.mainApp.font_m)
+        self.txt_ci.setReadOnly(True)
         self.txt_ci.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_ci, lambda: self.txt_nombre.setFocus() , context=QtCore.Qt.WidgetShortcut)
         self.txt_ci.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_ci, lambda: self.txt_nombre.setFocus() , context=QtCore.Qt.WidgetShortcut)
         layout_form.addRow(label_ci, self.txt_ci)
