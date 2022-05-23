@@ -330,6 +330,7 @@ public final class DATA_CLASS {
             String referencia = "";
             String id_entidad = "";
             int id_movimiento = 0;
+            String descripcion_auditoria = "";
             
             switch(tipo){
                 // VENTA
@@ -345,6 +346,8 @@ public final class DATA_CLASS {
                     query = "SELECT * FROM venta WHERE ID = (SELECT MAX(ID) FROM venta);";
                     rs = stmt.executeQuery(query);
                     id_movimiento = rs.getInt("ID");
+                    
+                    descripcion_auditoria = "VENTA DE PRODUCTOS";
                     break;
                 
                 // COMPRA
@@ -361,6 +364,7 @@ public final class DATA_CLASS {
                     rs = stmt.executeQuery(query);
                     id_movimiento = rs.getInt("ID");
                     
+                    descripcion_auditoria = "COMPRA DE PRODUCTOS";
                     break;
             }
             
@@ -419,6 +423,8 @@ public final class DATA_CLASS {
                     DB.con.commit();
                 }
             }
+            
+            INSERT_AUDITORIA(descripcion_auditoria, "REF: "+referencia, personal);
             return referencia;
         }catch(SQLException e){
             System.out.println("ERROR IN MOVIMIENTO: "+e);
@@ -479,7 +485,7 @@ public final class DATA_CLASS {
         }
     }
     
-        public ArrayList<String[]> LIKE_SENTENCE_USER(String query){
+    public ArrayList<String[]> LIKE_SENTENCE_USER(String query){
         try{
             try (Statement stmt = DB.con.createStatement()){
                 
@@ -499,6 +505,19 @@ public final class DATA_CLASS {
         }catch(SQLException e){
             System.out.println("ERROR IN LIKE_SENTENCE: "+e);
             return null;
+        }
+    }
+    
+    private void INSERT_AUDITORIA(String descripcion, String ref, String id_usuario){
+        try{
+            try (Statement stmt = DB.con.createStatement()) {
+                String query = "INSERT INTO auditoria (descripcion, ID_personal) "
+                        + "VALUES ('"+descripcion+" "+ref+"', "+id_usuario+")";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN INSERT_AUDITORIA: "+e);
         }
     }
 //-----------------------------------------------------------------------------------------------------------------------------//

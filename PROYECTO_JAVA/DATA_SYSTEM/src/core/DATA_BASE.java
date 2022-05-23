@@ -57,6 +57,7 @@ public final class DATA_BASE {
             rs = stmt.executeQuery("SELECT * FROM producto;");
             rs = stmt.executeQuery("SELECT * FROM proveedor;");
             rs = stmt.executeQuery("SELECT * FROM venta;");
+            rs = stmt.executeQuery("SELECT * FROM auditoria;");
             
         } catch (SQLException ex) {
             if (ex.toString().substring(74, 87).equals("no such table")){
@@ -193,7 +194,13 @@ public final class DATA_BASE {
             "   `valor` VARCHAR(50) NOT NULL);\n" +
             
             "INSERT INTO ajustes (clave, valor) VALUES ('IVA', '16');\n" +
-            "INSERT INTO ajustes (clave, valor) VALUES ('AUMENTO_VENTA', '45');";
+            "INSERT INTO ajustes (clave, valor) VALUES ('AUMENTO_VENTA', '45');\n"+
+            
+            "CREATE TABLE `auditoria` (\n"+
+            "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"+
+            "   `descripcion` VARCHAR(50) NOT NULL DEFAULT '',\n"+
+            "   `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,\n"+
+            "   `ID_personal` INT(11) NOT NULL);";
                         
             System.out.println(sql);
             stmt.executeUpdate(sql);
