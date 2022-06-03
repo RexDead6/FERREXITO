@@ -16,28 +16,33 @@ class Dialog_personal(QtWidgets.QDialog):
         self.IS_EDIT = edit
 
         if self.IS_EDIT and self.mainApp.frame_personal.table_personal.selectionModel().hasSelection():
-            row = self.products_table.currentRow()
+            row = self.mainApp.frame_personal.table_personal.currentRow()
             self.personal = self.mainApp.DATA_SYSTEM.SELECT_USER(self.mainApp.frame_personal.table_personal.item(row, 0).text())
             self.txt_ci.setText(self.personal[1])
             self.txt_nombre.setText(self.personal[2])
             self.box_cargo.setCurrentIndex(int(self.personal[3]))
 
     def register_user(self):
-        if self.txt_ci.text() == "" or self.box_cargo.currentIndex() == 0 or self.txt_nombre.text() == "" or self.txt_pass.text() == "" or self.txt_pass1.text():
-            QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "RELLENE TODOS LOS FORMULARIOS")
+        if self.txt_ci.text() == "" or self.box_cargo.currentIndex() == 0 or self.txt_nombre.text() == "" or self.txt_pass.text() == "" or self.txt_pass1.text() == "":
+            QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "RELLENE TODOS LOS FORMULARIOS")
             return None
         
         if self.txt_pass.text() != self.txt_pass1.text():
-            QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑAS NO COINCIDEN")
+            QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑAS NO COINCIDEN")
             self.txt_pass.setText("")
             self.txt_pass1.setText("")
             self.txt_pass.setFocus()
+            return None
+
+        if self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text()) != None:
+            QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "USUARIO YA HA SIDO REGISTRADO")
             return None
 
         SUCCESS = self.mainApp.DATA_SYSTEM.INSERT_USER(self.txt_ci.text(), self.txt_nombre.text(), self.box_cargo.currentIndex(), self.txt_pass.text())
         if SUCCESS:
             QMessageBox.information(self.msgBox, "::: OPERACIÓN EXITOSA :::", "USUARIO REGISTRADO EXITOSAMENTE")
             self.mainApp.frame_personal.add_data_table()
+            self.close()
         else:
             QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "ERROR AL REGISTRAR USUARIO, INTENTE DE NUEVO")
 
@@ -117,6 +122,7 @@ class Dialog_personal(QtWidgets.QDialog):
         self.btn_cancelar = QtWidgets.QPushButton("CANCELAR")
         self.btn_cancelar.setFont(self.mainApp.font_m)
         self.btn_cancelar.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.btn_cancelar.clicked.connect(lambda: self.close())
         layout_button.addWidget(self.btn_cancelar)
         
         self.show()

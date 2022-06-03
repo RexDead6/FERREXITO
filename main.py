@@ -1,3 +1,4 @@
+from ast import arg
 from PyQt5 import QtCore, QtWidgets, QtGui
 import sys
 import jpype
@@ -13,7 +14,7 @@ class windows_main(QtWidgets.QMainWindow):
 
     DATA_SYSTEM  = None
     id_user      = None
-    cargo        = None
+    cargo        = 0
     block_change = False
 
     def __init__(self):
@@ -78,21 +79,21 @@ class windows_main(QtWidgets.QMainWindow):
         self.font_g.setPointSize(20)
 
         # FRAMES/PANTALLAS DE LA VENTANA
-        self.frame_login       = Frame_login(args=self)
-        self.frame_facturacion = Frame_facturacion(args=self)
-        self.frame_compra      = Frame_compra(args=self)
-        self.frame_productos   = Tabla_productos(args=self)
-        self.frame_movimientos = Tabla_movimientos(args=self)
-        self.frame_personal    = Tabla_empleados(args=self)
+        self.frame_login              = Frame_login(args=self)
+        self.frame_facturacion        = Frame_facturacion(args=self)
+        self.frame_compra             = Frame_compra(args=self)
+        self.frame_productos          = Tabla_productos(args=self)
+        self.frame_movimientos        = Tabla_movimientos(args=self)
+        self.frame_personal           = Tabla_empleados(args=self)
 
         # STACK DE CADA FRAME
         self.stack = QtWidgets.QStackedWidget()
-        self.stack.addWidget(self.frame_login)       # 0
-        self.stack.addWidget(self.frame_facturacion) # 1
-        self.stack.addWidget(self.frame_compra)      # 2
-        self.stack.addWidget(self.frame_productos)   # 3
-        self.stack.addWidget(self.frame_movimientos) # 4
-        self.stack.addWidget(self.frame_personal)    # 5
+        self.stack.addWidget(self.frame_login)              # 0
+        self.stack.addWidget(self.frame_facturacion)        # 1
+        self.stack.addWidget(self.frame_compra)             # 2
+        self.stack.addWidget(self.frame_productos)          # 3
+        self.stack.addWidget(self.frame_movimientos)        # 4
+        self.stack.addWidget(self.frame_personal)           # 5
         layout_main.addWidget(self.stack)
 
         # MENU BAR
@@ -116,21 +117,23 @@ class windows_main(QtWidgets.QMainWindow):
 
         action_productos = QtWidgets.QAction("PRODUCTOS", self)
         action_productos.triggered.connect(lambda: self.change_frame("productos"))
-        
-        action_empleados = QtWidgets.QAction("EMPLEADOS", self)
-        action_empleados.triggered.connect(lambda: self.change_frame("empleados"))
 
         action_movimientos = QtWidgets.QAction("MOVIMIENTOS", self)
         action_movimientos.triggered.connect(lambda: self.change_frame("movimientos"))
 
-        action_auditoria = QtWidgets.QAction("AUDITORIA", self)
-        #action_auditoria.triggered.connect(lambda: self.change_frame("productos"))
-
         logistica_menu = self.menubar.addMenu("LOGÍSTICA")
         logistica_menu.addAction(action_productos)
-        logistica_menu.addAction(action_empleados)
         logistica_menu.addAction(action_movimientos)
-        logistica_menu.addAction(action_auditoria)
+
+        action_empleados = QtWidgets.QAction("EMPLEADOS", self)
+        action_empleados.triggered.connect(lambda: self.change_frame("empleados"))
+
+        action_auditoria = QtWidgets.QAction("AUDITORIA", self)
+        #action_auditoria.triggered.connect(lambda: self.change_frame(""))
+
+        administracion_menu = self.menubar.addMenu("ADMINISTRACION")
+        administracion_menu.addAction(action_empleados)
+        administracion_menu.addAction(action_auditoria)
 
 app = QtWidgets.QApplication([])
 application = windows_main()

@@ -127,6 +127,7 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.table_productos.setColumnCount(5)
         self.table_productos.setHorizontalHeaderLabels(['ID', 'NOMBRE', 'CANTIDAD', 'P. UNIDAD', 'P. TOTAL'])
         self.table_productos.resizeColumnsToContents()
+        self.table_productos.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         vlayout_table.addWidget(self.table_productos)
 
         form_total = QtWidgets.QFormLayout()

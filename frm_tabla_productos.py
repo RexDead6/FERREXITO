@@ -50,6 +50,7 @@ class Tabla_productos(QtWidgets.QFrame):
         self.table_productos.setColumnCount(6)
         self.table_productos.setHorizontalHeaderLabels(['ID', 'CÓDIGO', 'NOMBRE', 'EXISTENCIA', 'ALERTA', 'PRECIO'])
         self.table_productos.resizeColumnsToContents()
+        self.table_productos.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_productos)
 
         layout_botones = QtWidgets.QVBoxLayout()

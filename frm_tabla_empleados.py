@@ -12,7 +12,7 @@ class Tabla_empleados(QtWidgets.QFrame):
         self.create_widgets()
 
     def open_forms(self, edit):
-        self.dialog = Dialog_personal(args=self)
+        self.dialog = Dialog_personal(args=self.mainApp)
         self.dialog.SET_EDIT(edit)
 
     def add_data_table(self):
@@ -40,7 +40,7 @@ class Tabla_empleados(QtWidgets.QFrame):
         layout_main = QtWidgets.QVBoxLayout()
         self.setLayout(layout_main)
 
-        titulo = QtWidgets.QLabel("MOVIMIENTOS")
+        titulo = QtWidgets.QLabel("USUARIOS")
         titulo.setFont(self.mainApp.font_g)
         layout_main.addWidget(titulo)
         layout_main.setAlignment(titulo, QtCore.Qt.AlignHCenter)
@@ -53,6 +53,7 @@ class Tabla_empleados(QtWidgets.QFrame):
         self.table_personal.setColumnCount(3)
         self.table_personal.setHorizontalHeaderLabels(['CEDULA', 'CARGO', 'NOMBRE'])
         self.table_personal.resizeColumnsToContents()
+        self.table_personal.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_personal)
 
         layout_botones = QtWidgets.QVBoxLayout()
@@ -63,16 +64,22 @@ class Tabla_empleados(QtWidgets.QFrame):
         self.txt_buscar.setMaximumWidth(200)
         self.txt_buscar.textChanged.connect(self.input_buscar)
         layout_botones.addWidget(self.txt_buscar)
-
+        
         self.btn_registrar = QtWidgets.QPushButton("REGISTRAR")
         self.btn_registrar.setFont(self.mainApp.font_m)
-        self.btn_registrar.setMaximumWidth(80)
+        self.btn_registrar.setMinimumHeight(80)
+        self.btn_registrar.clicked.connect(lambda: self.open_forms(False))
         layout_botones.addWidget(self.btn_registrar)
 
         self.btn_abrir = QtWidgets.QPushButton("EDITAR")
         self.btn_abrir.setFont(self.mainApp.font_m)
         self.btn_abrir.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_abrir.setMinimumHeight(80)
+        self.btn_abrir.clicked.connect(lambda: self.open_forms(True))
         layout_botones.addWidget(self.btn_abrir)
+
+        if self.mainApp.cargo > 0:
+            self.btn_abrir.setEnabled(False)
+            self.btn_registrar.setEnabled(False)
 
         layout_botones.addStretch()

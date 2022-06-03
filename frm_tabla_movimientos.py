@@ -50,6 +50,7 @@ class Tabla_movimientos(QtWidgets.QFrame):
         self.table_movimientos.setColumnCount(6)
         self.table_movimientos.setHorizontalHeaderLabels(['ID', 'REFERENCIA', 'TIPO', 'SUBTOTAL', 'IVA', 'TOTAL'])
         self.table_movimientos.resizeColumnsToContents()
+        self.table_movimientos.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_movimientos)
 
         layout_botones = QtWidgets.QVBoxLayout()
