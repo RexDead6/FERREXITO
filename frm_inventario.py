@@ -1,28 +1,19 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtWidgets import QMessageBox
+import jpype
 
-from dialogs.dialog_cobranza import Dialog_cobranza
-from dialogs.dialog_registro_cliente import Dialog_cliente
-from dialogs.dialog_consultar import Dialog_consultar
-from dialogs.dialog_auth import Dialog_auth
+import jpype
 
-class Frame_facturacion(QtWidgets.QFrame):
+class Frame_inventario(QtWidgets.QFrame):
     
     mainApp = None
-    id_prod = None
 
     def __init__(self, *args, **kwargs):
-        super(Frame_facturacion, self).__init__()
+        super(Frame_inventario, self).__init__()
         self.mainApp = kwargs['args']
         self.create_widgets()
 
-    def search_cliente(self):
-        cliente = self.mainApp.DATA_SYSTEM.SELECT_CLIENTE(self.txt_ci.text())
-
-        if cliente == None:
-            client_dialog = Dialog_cliente(args=self.mainApp)
-        else:
-            self.txt_nombre.setText(cliente[2])
-            self.txt_barcode.setFocus()
+        self.msgBox = QMessageBox()
 
     def search_barcode(self):
         self.data = self.mainApp.DATA_SYSTEM.SELECT_PRODUCTO(self.txt_barcode.text())
@@ -76,21 +67,39 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_cantidad.setEnabled(False)
         self.txt_barcode.setFocus()
 
-    def cobrar(self):
-
+    def generar_ajuste(self):
         if float(self.txt_total.text().replace(".", "").replace(",", ".")) <= 0.0:
-            self.msg.setText("SIN ARTICULOS PARA COBRAR")
+            self.msg.setText("SIN ARTICULOS")
             return None
 
-        self.dialog_cobrar = Dialog_cobranza(args=self.mainApp)
-        self.dialog_cobrar.get_total(self.txt_total.text())
+        if self.txt_descripcion_inv.text() == "":
+            self.msg.setText("INGRESE UNA DESCRIPCION DEL AJUSTE")
+            return None
 
-    def open_devolucion(self):
-        if self.mainApp.cargo <= 1:
-            self.mainApp.frame_devolucion.id_user = self.mainApp.id_user
-            self.mainApp.change_frame("devolucion")
+        if self.box_manejo.currentIndex() == 0:
+            self.msg.setText("INGRESE UNA METODO PARA EL AJUSTE")
+            return None
+
+        metodo = 5 if self.box_manejo.currentIndex() == 1 else 4
+
+        productos_raw = jpype.JArray(jpype.JInt)
+        cantidad_raw  = jpype.JArray(jpype.JInt)
+        precio_raw    = jpype.JArray(jpype.JFloat)
+        productos = productos_raw(self.table_productos.rowCount())
+        cantidad  = cantidad_raw(self.table_productos.rowCount())
+        precio    = precio_raw(self.table_productos.rowCount())
+        for i in range(self.table_productos.rowCount()):
+            productos[i] = int(self.table_productos.item(i, 0).text())
+            cantidad[i]  = int(self.table_productos.item(i, 2).text())
+            precio[i]    = float(self.table_productos.item(i, 3).text().replace(".", "").replace(",", "."))
+
+        referencia = self.mainApp.DATA_SYSTEM.MOVIMIENTO(metodo, self.txt_descripcion_inv.text(), self.mainApp.id_user, self.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
+
+        if referencia != None:
+            QMessageBox.information(self.msgBox, "::AJUSTE EXITOSO::", "SU AJUSTE HA SIDO PROCESADO EXITOSAMENTE (REF: "+referencia+")")
         else:
-            self.dialog_autenticar = Dialog_auth(mainApp=self.mainApp, success=lambda: self.mainApp.change_frame("devolucion"), error=None)
+            QMessageBox.critical(self.msgBox, "::ERROR::", "NO SE HA PODIDO PROCESAR SU AJUSTE,\nINTENTE DE NUEVO")
+        self.default_forms()
 
     def delete_a_row(self):
         try:
@@ -99,30 +108,15 @@ class Frame_facturacion(QtWidgets.QFrame):
         except AttributeError:
             pass
 
-    def open_consultar(self):
-        self.dialog_consultar = Dialog_consultar(args=self.mainApp)
-
     def default_forms(self):
         self.table_productos.setRowCount(0)
         self.txt_total.setText("0,00")
-        self.txt_ci.setText("")
-        self.txt_nombre.setText("")
-        self.txt_nombre.setReadOnly(True)
         self.txt_barcode.setText("")
         self.txt_descripcion.setText("")
+        self.txt_descripcion_inv.setText("")
         self.txt_costo.setText("")
         self.txt_cantidad.setText("")
-        self.txt_ci.setFocus()
-
-    def keyPressEvent(self, event):
-        if event.key() == QtCore.Qt.Key_F1:
-            self.open_consultar()
-        elif event.key() == QtCore.Qt.Key_F2:
-            self.delete_a_row()
-        elif event.key() == QtCore.Qt.Key_F5:
-            self.cobrar()
-        elif event.key() == QtCore.Qt.Key_F10:
-            self.open_devolucion()
+        self.box_manejo.setCurrentIndex(0)
 
     def create_widgets(self):
         hlayout_main = QtWidgets.QHBoxLayout()
@@ -152,8 +146,8 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_total.setReadOnly(True)
         form_total.addRow(label_total, self.txt_total)
 
-        form_facturacion = QtWidgets.QFormLayout()
         vlayout_botones = QtWidgets.QVBoxLayout()
+        form_layout = QtWidgets.QFormLayout()
 
         font_msg = QtGui.QFont()
         font_msg.setPointSize(16)
@@ -162,31 +156,11 @@ class Frame_facturacion(QtWidgets.QFrame):
 
         self.msg = QtWidgets.QLabel()
         self.msg.setStyleSheet("QLabel {background: #1F10FF; color: white}")
-        self.msg.setMinimumHeight(60)
+        self.msg.setMaximumHeight(60)
         self.msg.setFont(font_msg)
         self.msg.setAlignment(QtCore.Qt.AlignCenter)
         vlayout_botones.addWidget(self.msg)
-
-        label_ci = QtWidgets.QLabel("CEDULA:")
-        label_ci.setFont(self.mainApp.font_m)
-
-        self.txt_ci = QtWidgets.QLineEdit()
-        self.txt_ci.setFont(self.mainApp.font_m)
-        self.txt_ci.setText("-")
-        self.txt_ci.textChanged.connect(lambda: self.mainApp.input_format_number(self.txt_ci))
-        self.txt_ci.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_ci, self.search_cliente, context=QtCore.Qt.WidgetShortcut)
-        self.txt_ci.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_ci, self.search_cliente, context=QtCore.Qt.WidgetShortcut)
-        form_facturacion.addRow(label_ci, self.txt_ci)
-
-        label_nombre = QtWidgets.QLabel("NOMBRE:")
-        label_nombre.setFont(self.mainApp.font_m)
-
-        self.txt_nombre = QtWidgets.QLineEdit()
-        self.txt_nombre.setFont(self.mainApp.font_m)
-        self.txt_nombre.setText("CLIENTE GENERAL")
-        self.txt_nombre.setReadOnly(True)
-        form_facturacion.addRow(label_nombre, self.txt_nombre)
-
+        
         label_barcode = QtWidgets.QLabel("CÓDIGO DE BARRA:")
         label_barcode.setFont(self.mainApp.font_m)
 
@@ -194,15 +168,15 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_barcode.setFont(self.mainApp.font_m)
         self.txt_barcode.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_barcode, self.search_barcode, context=QtCore.Qt.WidgetShortcut)
         self.txt_barcode.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_barcode, self.search_barcode, context=QtCore.Qt.WidgetShortcut)
-        form_facturacion.addRow(label_barcode, self.txt_barcode)
+        form_layout.addRow(label_barcode, self.txt_barcode)
 
-        label_descripcion = QtWidgets.QLabel("DESCRIPCIÓN:")
+        label_descripcion = QtWidgets.QLabel("PRODUCTO:")
         label_descripcion.setFont(self.mainApp.font_m)
 
         self.txt_descripcion = QtWidgets.QLineEdit()
         self.txt_descripcion.setFont(self.mainApp.font_m)
         self.txt_descripcion.setReadOnly(True)
-        form_facturacion.addRow(label_descripcion, self.txt_descripcion)
+        form_layout.addRow(label_descripcion, self.txt_descripcion)
 
         label_costo = QtWidgets.QLabel("COSTO:")
         label_costo.setFont(self.mainApp.font_m)
@@ -210,7 +184,7 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_costo = QtWidgets.QLineEdit()
         self.txt_costo.setFont(self.mainApp.font_m)
         self.txt_costo.setReadOnly(True)
-        form_facturacion.addRow(label_costo, self.txt_costo)
+        form_layout.addRow(label_costo, self.txt_costo)
 
         label_cantidad = QtWidgets.QLabel("CANTIDAD:")
         label_cantidad.setFont(self.mainApp.font_m)
@@ -221,19 +195,36 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_cantidad.textChanged.connect(lambda: self.mainApp.input_format_number(self.txt_cantidad))
         self.txt_cantidad.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_cantidad, self.enter_cantidad, context=QtCore.Qt.WidgetShortcut)
         self.txt_cantidad.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_cantidad, self.enter_cantidad, context=QtCore.Qt.WidgetShortcut)
-        form_facturacion.addRow(label_cantidad, self.txt_cantidad)
+        form_layout.addRow(label_cantidad, self.txt_cantidad)
+
+        label_manejo =  QtWidgets.QLabel("MANEJO:")
+        label_manejo.setFont(self.mainApp.font_m)
+
+        self.box_manejo = QtWidgets.QComboBox()
+        self.box_manejo.addItem("---SELECCIONE---")
+        self.box_manejo.addItem("AGREGAR")
+        self.box_manejo.addItem("SUBTRAER")
+        self.box_manejo.setFont(self.mainApp.font_m)
+        form_layout.addRow(label_manejo, self.box_manejo)
+
+        label_descripcion_inv = QtWidgets.QLabel("DESCRIPCION DE AJUSTE:")
+        label_descripcion_inv.setFont(self.mainApp.font_m)
+
+        self.txt_descripcion_inv = QtWidgets.QLineEdit()
+        self.txt_descripcion_inv.setFont(self.mainApp.font_m)
+        form_layout.addRow(label_descripcion_inv, self.txt_descripcion_inv)
 
         hlayout_main.addLayout(vlayout_botones)
-        vlayout_botones.addLayout(form_facturacion)
+        vlayout_botones.addLayout(form_layout)
 
         grid_botones = QtWidgets.QGridLayout()
         vlayout_botones.addLayout(grid_botones)
 
-        self.btn_aceptar = QtWidgets.QPushButton("ACEPTAR (ENTER)")
+        self.btn_aceptar = QtWidgets.QPushButton("GENERAR AJUSTE (F1)")
         self.btn_aceptar.setFont(self.mainApp.font_m)
         self.btn_aceptar.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_aceptar.setMinimumHeight(80)
-        self.btn_aceptar.clicked.connect(self.enter_cantidad)
+        self.btn_aceptar.clicked.connect(self.generar_ajuste)
         grid_botones.addWidget(self.btn_aceptar, 0, 0)
 
         self.btn_borrar = QtWidgets.QPushButton("BORRAR REGISTRO (F2)")
@@ -242,32 +233,3 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.btn_borrar.setMinimumHeight(80)
         self.btn_borrar.clicked.connect(self.delete_a_row)
         grid_botones.addWidget(self.btn_borrar, 0, 1)
-
-        self.btn_devolucion = QtWidgets.QPushButton("DEVOLUCION (F10)")
-        self.btn_devolucion.setFont(self.mainApp.font_m)
-        self.btn_devolucion.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.btn_devolucion.setMinimumHeight(80)
-        self.btn_devolucion.clicked.connect(self.open_devolucion)
-        grid_botones.addWidget(self.btn_devolucion, 1, 0)
-
-        self.btn_consultar = QtWidgets.QPushButton("CONSULTAR (F1)")
-        self.btn_consultar.setFont(self.mainApp.font_m)
-        self.btn_consultar.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.btn_consultar.setMinimumHeight(80)
-        self.btn_consultar.clicked.connect(self.open_consultar)
-        grid_botones.addWidget(self.btn_consultar, 1, 1)
-
-        self.btn_cobrar = QtWidgets.QPushButton("COBRAR (F5)")
-        self.btn_cobrar.setFont(self.mainApp.font_m)
-        self.btn_cobrar.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.btn_cobrar.setMinimumHeight(80)
-        self.btn_cobrar.clicked.connect(self.cobrar)
-        grid_botones.addWidget(self.btn_cobrar, 2, 0)
-
-        self.btn_cierre = QtWidgets.QPushButton("CIERRE DE CAJA (F11)")
-        self.btn_cierre.setFont(self.mainApp.font_m)
-        self.btn_cierre.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
-        self.btn_cierre.setMinimumHeight(80)
-        grid_botones.addWidget(self.btn_cierre, 2, 1)
-
-        vlayout_botones.addStretch()

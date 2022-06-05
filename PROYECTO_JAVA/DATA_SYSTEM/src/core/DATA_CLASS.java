@@ -521,7 +521,7 @@ public final class DATA_CLASS {
                     id_movimiento = rs.getInt("ID");
                     
                     String conf = "";
-                    if (tipo == 4){
+                    if (tipo == 5){
                         conf = "(+)";
                     }else {
                         conf = "(-)";
@@ -708,8 +708,8 @@ public final class DATA_CLASS {
             case 1: mov_str = "venta"; break;
             case 2: mov_str = "compra"; break;
             case 3: mov_str = "devolucion"; break;
-            case 4: mov_str = "ajustes"; break;
-            case 5: mov_str = "ajustes"; break;
+            case 4: mov_str = "inventario"; break;
+            case 5: mov_str = "inventario"; break;
         }
         return mov_str;
     }
