@@ -202,6 +202,30 @@ public final class DATA_CLASS {
         }
     }
     
+    public String[] SELECT_PRODUCTO_BY_ID(String id){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String[] data = new String[6];
+                
+                String query = "SELECT * FROM producto WHERE ID = "+id+"";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("codigo");
+                data[2] = rs.getString("descripcion");
+                data[3] = rs.getString("existencia");
+                data[4] = rs.getString("costo_venta");
+                data[5] = rs.getString("cantidad_alerta");
+                
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_PRODUCTO: "+e);
+            return null;
+        }
+    }
+    
     public String[] SELECT_PRODUCTO(String codigo){
         try{
             try (Statement stmt = DB.con.createStatement()){
@@ -222,6 +246,29 @@ public final class DATA_CLASS {
             }
         }catch(SQLException e){
             System.out.println("ERROR IN SELECT_PRODUCTO: "+e);
+            return null;
+        }
+    }
+    
+    public String[] SELECT_CLIENTE_BY_ID(String id){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String[] data = new String[5];
+                
+                String query = "SELECT * FROM cliente WHERE ID = "+id+";";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("CI");
+                data[2] = rs.getString("nombre");
+                data[3] = rs.getString("telefono");
+                data[4] = rs.getString("direccion");
+                
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_CLIENTE: "+e);
             return null;
         }
     }
@@ -290,6 +337,85 @@ public final class DATA_CLASS {
             }
         }catch(SQLException e){
             System.out.println("ERROR IN SELECT_ALL_MOVIMIENTOS: "+e);
+            return null;
+        }
+    }
+    
+    public String[] SELECT_FACTURA_VENTA(String id){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String[] data = new String[7];
+                
+                String query = "SELECT * FROM venta WHERE ID = "+id+";";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("estatus");
+                data[2] = rs.getString("referencia");
+                data[3] = rs.getString("personal");
+                data[4] = rs.getString("cliente");
+                data[5] = rs.getString("fecha");
+                data[6] = rs.getString("cierre");
+                
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_FACTURA: "+e);
+            return null;
+        }
+    }
+    
+    public String[] SELECT_MOVIMIENTO(String ref){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String[] data = new String[9];
+                
+                String query = "SELECT * FROM cuerpo WHERE ID = "+ref;
+                ResultSet rs = stmt.executeQuery(query);
+                
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("estatus");
+                data[2] = rs.getString("tipo");
+                data[3] = rs.getString("ID_encabezado");
+                data[4] = rs.getString("referencia");
+                data[5] = rs.getString("subtotal");
+                data[6] = rs.getString("porcent_IVA");
+                data[7] = rs.getString("IVA");
+                data[8] = rs.getString("total");
+                
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_FACTURA: "+e);
+            return null;
+        }
+    }
+    
+    public ArrayList<String[]> SELECT_CUERPO_PRODUCTOS(String id_cuerpo){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT * FROM cuerpo_productos WHERE ID_cuerpo = "+id_cuerpo;
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[6];
+                    data[0] = rs.getString("ID");
+                    data[1] = rs.getString("ID_producto");
+                    data[2] = rs.getString("ID_cuerpo");
+                    data[3] = rs.getString("precio_unitario");
+                    data[4] = rs.getString("cantidad");
+                    data[5] = rs.getString("precio_total");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_FACTURA: "+e);
             return null;
         }
     }
@@ -366,6 +492,42 @@ public final class DATA_CLASS {
                     
                     descripcion_auditoria = "COMPRA DE PRODUCTOS";
                     break;
+                // DEVOLUCION
+                case 3:
+                    query = "SELECT * FROM venta WHERE ID = "+entidad;
+                    rs = stmt.executeQuery(query);
+                    String id_cliente = rs.getString("cliente");
+                    id_entidad = rs.getString("ID");
+                    
+                    query = "INSERT INTO devolucion (cliente, personal, ID_venta) VALUES ("+id_cliente+", "+personal+", "+id_entidad+")";
+                    stmt.executeUpdate(query);
+                    DB.con.commit();
+                    
+                    query = "SELECT * FROM devolucion WHERE ID = (SELECT MAX(ID) FROM devolucion);";
+                    rs = stmt.executeQuery(query);
+                    id_movimiento = rs.getInt("ID");
+                    
+                    descripcion_auditoria = "DEVOLUCIÓN DE PRODUCTOS";
+                    break;
+                // AJUSTES DE INVENTARIO ++
+                case 4:
+                case 5:
+                    query = "INSERT INTO inventario (personal, detalle) VALUES ("+personal+", '"+entidad+"')";
+                    stmt.executeUpdate(query);
+                    DB.con.commit();
+                    
+                    query = "SELECT * FROM inventario WHERE ID = (SELECT MAX(ID) FROM inventario);";
+                    rs = stmt.executeQuery(query);
+                    id_movimiento = rs.getInt("ID");
+                    
+                    String conf = "";
+                    if (tipo == 4){
+                        conf = "(+)";
+                    }else {
+                        conf = "(-)";
+                    }
+                    descripcion_auditoria = "AJUSTES DE INVENTARIO"+conf;
+                    break;
             }
             
             query = "SELECT * FROM ajustes WHERE clave = 'IVA'";
@@ -424,7 +586,17 @@ public final class DATA_CLASS {
                 }
             }
             
-            INSERT_AUDITORIA(descripcion_auditoria, "REF: "+referencia, personal);
+            if (tipo == 3){
+                query = "UPDATE venta SET estatus = 1 WHERE ID = "+id_entidad;
+                stmt.executeUpdate(query);
+                DB.con.commit();
+                
+                query = "UPDATE cuerpo SET estatus = 1 WHERE referencia = "+referencia;
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            
+            INSERT_AUDITORIA(descripcion_auditoria, "(REF: "+referencia+")", personal);
             return referencia;
         }catch(SQLException e){
             System.out.println("ERROR IN MOVIMIENTO: "+e);

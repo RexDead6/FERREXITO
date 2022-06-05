@@ -11,11 +11,12 @@ class Frame_login(QtWidgets.QFrame):
 
     def iniciar_sesion(self):
         data = self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_user.text(), self.txt_clave.text())
+        
+        self.txt_user.setText("")
+        self.txt_clave.setText("")
 
         if data == None:
             self.label_msg.setVisible(True)
-            self.txt_user.setText("")
-            self.txt_clave.setText("")
             self.txt_user.setFocus()
             return None
         
@@ -23,11 +24,10 @@ class Frame_login(QtWidgets.QFrame):
         self.mainApp.cargo   = int(data[3])
         self.mainApp.change_frame("venta")
 
-        if self.mainApp.cargo != 2:
-            self.mainApp.menubar.setVisible(True)
+        self.mainApp.menubar.setVisible(True)
 
     def create_widgets(self):
-        self.setStyleSheet("QFrame{background-color: #C6C38B}")
+        self.setStyleSheet("QFrame{background-color: #C6C38B; margin:0}")
         layout_main = QtWidgets.QVBoxLayout()
         self.setLayout(layout_main)
 

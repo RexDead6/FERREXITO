@@ -21,7 +21,7 @@ class Dialog_consultar(QtWidgets.QDialog):
             self.label_data.setText("ARTICULO INEXISTENTE\nDESCRIPCION:\nPRECIO:")
 
     def create_widgets(self):
-        self.setWindowTitle("CONSULTAR PRODUCTO")
+        self.setWindowTitle("::CONSULTAR PRODUCTO::")
         self.setModal(True)
 
         layout_main = QtWidgets.QVBoxLayout()

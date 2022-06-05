@@ -9,6 +9,7 @@ from frm_login import Frame_login
 from frm_tabla_productos import Tabla_productos
 from frm_tabla_empleados import Tabla_empleados
 from frm_tabla_movimientos import Tabla_movimientos
+from frm_devolucion import Frame_devolucion
 
 class windows_main(QtWidgets.QMainWindow):
 
@@ -58,9 +59,18 @@ class windows_main(QtWidgets.QMainWindow):
         elif f == "empleados":
             self.stack.setCurrentIndex(5)
             self.frame_personal.add_data_table()
+        elif f == "devolucion":
+            self.stack.setCurrentIndex(6)
+        elif f == "login":
+            self.stack.setCurrentIndex(0)
+            self.id_user = 0
+            self.cargo   = 0
+            self.menubar.setVisible(False)
+            self.frame_login.txt_user.setFocus()
 
     def create_widgets(self):
         self.setWindowTitle("FERREXITO")
+        self.setStyleSheet("QPushButton{padding: 10px}")
 
         cw = QtWidgets.QWidget()
         self.setCentralWidget(cw)
@@ -85,6 +95,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.frame_productos          = Tabla_productos(args=self)
         self.frame_movimientos        = Tabla_movimientos(args=self)
         self.frame_personal           = Tabla_empleados(args=self)
+        self.frame_devolucion         = Frame_devolucion(args=self)
 
         # STACK DE CADA FRAME
         self.stack = QtWidgets.QStackedWidget()
@@ -94,6 +105,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.stack.addWidget(self.frame_productos)          # 3
         self.stack.addWidget(self.frame_movimientos)        # 4
         self.stack.addWidget(self.frame_personal)           # 5
+        self.stack.addWidget(self.frame_devolucion)         # 6
         layout_main.addWidget(self.stack)
 
         # MENU BAR
@@ -134,6 +146,16 @@ class windows_main(QtWidgets.QMainWindow):
         administracion_menu = self.menubar.addMenu("ADMINISTRACION")
         administracion_menu.addAction(action_empleados)
         administracion_menu.addAction(action_auditoria)
+
+        action_cerrar_sesion = QtWidgets.QAction("CERRAR SESIÓN", self)
+        action_cerrar_sesion.triggered.connect(lambda: self.change_frame("login"))
+
+        action_cerrar_app = QtWidgets.QAction("CERRAR", self)
+        action_cerrar_app.triggered.connect(self.close)
+
+        sesion_menu = self.menubar.addMenu("SESIÓN")
+        sesion_menu.addAction(action_cerrar_sesion)
+        sesion_menu.addAction(action_cerrar_app)
 
 app = QtWidgets.QApplication([])
 application = windows_main()

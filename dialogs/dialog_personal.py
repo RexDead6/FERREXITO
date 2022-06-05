@@ -51,7 +51,7 @@ class Dialog_personal(QtWidgets.QDialog):
         main_layout = QtWidgets.QVBoxLayout()
         self.setLayout(main_layout)
 
-        titulo = QtWidgets.QLabel("FORMULARIO EMPLEADOS")
+        titulo = QtWidgets.QLabel("::FORMULARIO EMPLEADOS::")
         titulo.setFont(self.mainApp.font_g)
         main_layout.addWidget(titulo)
         main_layout.setAlignment(titulo, QtCore.Qt.AlignHCenter)
@@ -113,7 +113,7 @@ class Dialog_personal(QtWidgets.QDialog):
         main_layout.addLayout(layout_button)
         main_layout.setAlignment(layout_button, QtCore.Qt.AlignHCenter)
 
-        self.btn_aceptar = QtWidgets.QPushButton("ACPETAR")
+        self.btn_aceptar = QtWidgets.QPushButton("ACEPTAR")
         self.btn_aceptar.setFont(self.mainApp.font_m)
         self.btn_aceptar.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_aceptar.clicked.connect(self.register_user)

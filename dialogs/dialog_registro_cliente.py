@@ -36,7 +36,7 @@ class Dialog_cliente(QtWidgets.QDialog):
             self.mainApp.frame_facturacion.txt_ci.setFocus()
 
     def create_widgets(self):
-        self.setWindowTitle("REGISTRO CLIENTE")
+        self.setWindowTitle("::REGISTRO CLIENTE::")
         self.setModal(True)
 
         layout_main = QtWidgets.QVBoxLayout()

@@ -3,6 +3,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from dialogs.dialog_cobranza import Dialog_cobranza
 from dialogs.dialog_registro_cliente import Dialog_cliente
 from dialogs.dialog_consultar import Dialog_consultar
+from dialogs.dialog_auth import Dialog_auth
 
 class Frame_facturacion(QtWidgets.QFrame):
     
@@ -49,7 +50,6 @@ class Frame_facturacion(QtWidgets.QFrame):
             self.msg.setText("INGRESE UNA CANTIDAD VALIDA")
             return None
         
-        print("cantidad: {} existencia: {}".format(cantidad, self.data[3]))
         if cantidad > int(self.data[3]):
             self.msg.setText("CANTIDAD DESEADA SUPERA EXISTENCIAS")
             self.txt_cantidad.setText("")
@@ -85,6 +85,13 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.dialog_cobrar = Dialog_cobranza(args=self.mainApp)
         self.dialog_cobrar.get_total(self.txt_total.text())
 
+    def open_devolucion(self):
+        if self.mainApp.cargo <= 1:
+            self.mainApp.frame_devolucion.id_user = self.mainApp.id_user
+            self.mainApp.change_frame("devolucion")
+        else:
+            self.dialog_autenticar = Dialog_auth(mainApp=self.mainApp, success=lambda: self.mainApp.change_frame("devolucion"), error=None)
+
     def delete_a_row(self):
         try:
             self.txt_total.setText(self.mainApp.formato_moneda(float(self.txt_total.text().replace(".", "").replace(",", ".")) - float(self.table_productos.item(0, 4).text().replace(".", "").replace(",", "."))))
@@ -114,6 +121,8 @@ class Frame_facturacion(QtWidgets.QFrame):
             self.delete_a_row()
         elif event.key() == QtCore.Qt.Key_F5:
             self.cobrar()
+        elif event.key() == QtCore.Qt.Key_F10:
+            self.open_devolucion()
 
     def create_widgets(self):
         hlayout_main = QtWidgets.QHBoxLayout()
@@ -242,6 +251,7 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.btn_devolucion.setFont(self.mainApp.font_m)
         self.btn_devolucion.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_devolucion.setMinimumHeight(80)
+        self.btn_devolucion.clicked.connect(self.open_devolucion)
         grid_botones.addWidget(self.btn_devolucion, 1, 0)
 
         self.btn_consultar = QtWidgets.QPushButton("CONSULTAR (F1)")
