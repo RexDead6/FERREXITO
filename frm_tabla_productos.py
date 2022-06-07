@@ -28,7 +28,7 @@ class Tabla_productos(QtWidgets.QFrame):
             self.table_productos.setItem(0,2, QtWidgets.QTableWidgetItem(data[i][2]))
             self.table_productos.setItem(0,3, QtWidgets.QTableWidgetItem(data[i][3]))
             self.table_productos.setItem(0,4, QtWidgets.QTableWidgetItem(data[i][5]))
-            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(data[i][4]))
+            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(data[i][4]))))
 
         self.table_productos.resizeRowsToContents()
         self.table_productos.resizeColumnsToContents()

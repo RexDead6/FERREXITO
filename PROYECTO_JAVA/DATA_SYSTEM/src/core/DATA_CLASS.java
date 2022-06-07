@@ -366,6 +366,47 @@ public final class DATA_CLASS {
         }
     }
     
+    public String[] SELECT_CABECERA(String tipo,String ref){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String[] data = new String[10];
+                
+                String query = "SELECT * FROM "+tipo+" WHERE referencia = '"+ref+"';";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("estatus");
+                data[2] = rs.getString("referencia");
+                data[3] = rs.getString("personal");
+                data[4] = rs.getString("fecha");
+                try{
+                    data[5] = rs.getString("cierre");
+                }catch(Exception e){}
+                
+                try{
+                    data[6] = rs.getString("detalle");
+                }catch(Exception e){}
+                
+                try{
+                    data[7] = rs.getString("ID_venta");
+                }catch(Exception e){}
+                
+                try{
+                    data[8] = rs.getString("proveedor");
+                }catch(Exception e){}
+                
+                try{
+                    data[9] = rs.getString("cliente");
+                }catch(Exception e){}
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_FACTURA: "+e);
+            return null;
+        }
+    }
+    
     public String[] SELECT_MOVIMIENTO(String ref){
         try{
             try (Statement stmt = DB.con.createStatement()){

@@ -18,22 +18,26 @@ class Frame_devolucion(QtWidgets.QFrame):
 
     def search_factura(self):
         if self.txt_factura.text() == "":
+            self.clear_forms()
             return None
-        
+
         mov = self.mainApp.DATA_SYSTEM.SELECT_MOVIMIENTO(self.txt_factura.text())
 
         if mov == None:
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "FACTURA INEXISTENTE")
+            self.clear_forms()
             return False
 
         if int(mov[2]) != 1:
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "FACTURA INGRESADA NO PERTENECE A UNA VENTA")
+            self.clear_forms()
             return False
 
         data = self.mainApp.DATA_SYSTEM.SELECT_FACTURA_VENTA(mov[3])
 
         if int(data[1]) != 0:
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "FACTURA YA HA SIDO DEVUELTA Y ANULADA")
+            self.clear_forms()
             return False
         
         self.id_venta = data[0]
@@ -41,7 +45,7 @@ class Frame_devolucion(QtWidgets.QFrame):
         cliente = self.mainApp.DATA_SYSTEM.SELECT_CLIENTE_BY_ID(data[4])
         self.txt_ci.setText(cliente[1])
         self.txt_nombre.setText(cliente[2])
-        self.txt_fecha.setText("{}/{}/{} {}".format(data[5][8:10], data[5][5:7], data[5][:4], data[5][11:]))
+        self.txt_fecha.setText(self.mainApp.formato_fecha(data[5]))
         self.txt_total.setText(self.mainApp.formato_moneda(float(mov[8])))
 
         cuerpo_productos = self.mainApp.DATA_SYSTEM.SELECT_CUERPO_PRODUCTOS(self.txt_factura.text())
@@ -77,6 +81,15 @@ class Frame_devolucion(QtWidgets.QFrame):
         else:
             QMessageBox.critical(self.msgBox, "::ERROR::", "NO SE HA PODIDO PROCESAR SU DEVOLUION,\nINTENTE DE NUEVO")
         self.mainApp.change_frame("venta")
+        self.clear_forms()
+
+    def clear_forms(self):
+        self.txt_ci.setText("")
+        self.txt_factura.setText("")
+        self.txt_fecha.setText("")
+        self.txt_nombre.setText("")
+        self.txt_total.setText("")
+        self.table_productos.setRowCount(0)
 
     def create_widgets(self):
         layout_main = QtWidgets.QVBoxLayout()

@@ -18,6 +18,7 @@ class windows_main(QtWidgets.QMainWindow):
     id_user      = None
     cargo        = 0
     block_change = False
+    nombre       = ""
 
     def __init__(self):
         super(windows_main, self).__init__()
@@ -30,6 +31,9 @@ class windows_main(QtWidgets.QMainWindow):
 
     def formato_moneda(self, monto):
         return "{:,.2f}".format(monto).replace(".", "#").replace(",", ".").replace("#", ",")
+
+    def formato_fecha(self, data):
+        return "{}/{}/{} {}".format(data[8:10], data[5:7], data[:4], data[11:])
 
     def input_format_number(self, txt):
             new_string = ""
@@ -48,28 +52,37 @@ class windows_main(QtWidgets.QMainWindow):
         if f == "venta":
             self.stack.setCurrentIndex(1)
             self.frame_facturacion.default_forms()
+            self.setWindowTitle("FACTURACIÓN - {}".format(self.nombre))
         elif f == "compra":
             self.stack.setCurrentIndex(2)
             self.frame_compra.default_forms()
+            self.setWindowTitle("COMPRA A PROVEEDORES - {}".format(self.nombre))
         elif f == "productos":
             self.stack.setCurrentIndex(3)
             self.frame_productos.add_data_table()
+            self.setWindowTitle("INVENTARIO DE PRODUCTOS - {}".format(self.nombre))
         elif f == "movimientos":
             self.stack.setCurrentIndex(4)
             self.frame_movimientos.add_data_table()
+            self.setWindowTitle("MOVIMIENTOS DEL INVENTARIO - {}".format(self.nombre))
         elif f == "empleados":
             self.stack.setCurrentIndex(5)
             self.frame_personal.add_data_table()
+            self.setWindowTitle("EMPLEADOS DEL SISTEMA - {}".format(self.nombre))
         elif f == "devolucion":
+            self.frame_devolucion.clear_forms()
             self.stack.setCurrentIndex(6)
+            self.setWindowTitle("DEVOLUCION DE PRODUCTOS - {}".format(self.nombre))
         elif f == "login":
             self.stack.setCurrentIndex(0)
             self.id_user = 0
             self.cargo   = 0
             self.menubar.setVisible(False)
             self.frame_login.txt_user.setFocus()
+            self.setWindowTitle("INICIAR SESION")
         elif f == "inventario":
             self.stack.setCurrentIndex(7)
+            self.setWindowTitle("AJUSTE DE INVENTARIO - {}".format(self.nombre))
 
     def create_widgets(self):
         self.setWindowTitle("FERREXITO")

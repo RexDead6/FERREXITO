@@ -20,6 +20,7 @@ class Frame_login(QtWidgets.QFrame):
             self.txt_user.setFocus()
             return None
         
+        self.mainApp.nombre  = data[2]
         self.mainApp.id_user = data[0]
         self.mainApp.cargo   = int(data[3])
         self.mainApp.change_frame("venta")
