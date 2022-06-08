@@ -69,6 +69,25 @@ public final class DATA_CLASS {
         }
     }
     
+    public String[] SELECT_USER_BY_ID(String id){
+                try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "SELECT * FROM personal WHERE ID = "+id;
+                ResultSet rs = stmt.executeQuery(query);
+                
+                String[] data = new String[4];
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("C.I.");
+                data[2] = rs.getString("nombre");
+                data[3] = rs.getString("cargo");
+                return data;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR SELECT_USER: "+e);
+            return null;
+        }
+    }
+    
     public String[] SELECT_USER(String ci){
                 try{
             try (Statement stmt = DB.con.createStatement()){
@@ -124,6 +143,25 @@ public final class DATA_CLASS {
         }catch(SQLException e){
             System.out.println("ERROR INSERT_PROVEEDOR: "+e);
             return false;
+        }
+    }
+    
+    public String[] SELECT_PROVEEDOR_BY_ID(String id){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "SELECT * FROM proveedor WHERE ID = "+id+";";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                String[] data = new String[4];
+                data[0] = rs.getString("ID");
+                data[1] = rs.getString("RIF");
+                data[2] = rs.getString("razon_social");
+                data[3] = rs.getString("telefono");
+                return data;
+            }
+        } catch(SQLException e){
+            System.out.println("ERROR SELECT_PROVEEDOR: "+e);
+            return null;
         }
     }
     
@@ -370,7 +408,7 @@ public final class DATA_CLASS {
         try{
             try (Statement stmt = DB.con.createStatement()){
                 
-                String[] data = new String[10];
+                String[] data = new String[11];
                 
                 String query = "SELECT * FROM "+tipo+" WHERE referencia = '"+ref+"';";
                 ResultSet rs = stmt.executeQuery(query);

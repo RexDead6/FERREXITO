@@ -28,7 +28,8 @@ class Tabla_movimientos(QtWidgets.QFrame):
             row  = self.table_movimientos.currentRow()
             ref  = self.table_movimientos.item(row, 1).text()
             tipo = self.table_movimientos.item(row, 2).text()
-
+            self.dialog_mov = Dialog_movimiento(mainApp=self.mainApp)
+            self.dialog_mov.setData(tipo, ref)
 
     def onCurrentIndexComboTipo(self, _):
         self.input_buscar()
@@ -94,6 +95,7 @@ class Tabla_movimientos(QtWidgets.QFrame):
         self.btn_abrir = QtWidgets.QPushButton("ABRIR")
         self.btn_abrir.setFont(self.mainApp.font_m)
         self.btn_abrir.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.btn_abrir.clicked.connect(self.open_dialog_mov)
         self.btn_abrir.setMinimumHeight(80)
         layout_botones.addWidget(self.btn_abrir)
 

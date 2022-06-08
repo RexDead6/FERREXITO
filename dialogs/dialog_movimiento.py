@@ -15,9 +15,11 @@ class Dialog_movimiento(QtWidgets.QDialog):
         data = self.mainApp.DATA_SYSTEM.SELECT_CABECERA(tipo, ref)
         mov  = self.mainApp.DATA_SYSTEM.SELECT_MOVIMIENTO(ref)
         cuerpo_productos = self.mainApp.DATA_SYSTEM.SELECT_CUERPO_PRODUCTOS(mov[0])
+        empleado = self.mainApp.DATA_SYSTEM.SELECT_USER_BY_ID(data[3])
 
         self.txt_fecha.setText(self.mainApp.formato_fecha(data[4]))
         self.txt_total.setText(self.mainApp.formato_moneda(float(mov[8])))
+        self.txt_user.setText(empleado[1] + " - " + empleado[2])
 
         self.fill_table(cuerpo_productos)
 
@@ -28,6 +30,27 @@ class Dialog_movimiento(QtWidgets.QDialog):
             self.txt_nombre.setText("NOMBRE:")
             self.txt_nombre.setText(cliente[2])
             self.txt_descripcion.setText("N/A")
+        elif tipo == "compra":
+            proveedor = self.mainApp.DATA_SYSTEM.SELECT_PROVEEDOR_BY_ID(data[8])
+            self.label_ci.setText("RIF:")
+            self.txt_ci.setText(proveedor[1])
+            self.label_nombre.setText("RAZÓN SOCIAL:")
+            self.txt_nombre.setText(proveedor[2])
+            self.txt_descripcion.setText("N/A")
+        elif tipo == "inventario":
+            self.label_ci.setText("CEDULA:")
+            self.txt_ci.setText("N/A")
+            self.txt_nombre.setText("NOMBRE:")
+            self.txt_nombre.setText("N/A")
+            self.txt_descripcion.setText(data[6])
+        elif tipo == "devolucion":
+            cliente = self.mainApp.DATA_SYSTEM.SELECT_CLIENTE_BY_ID(data[9])
+            self.label_ci.setText("CEDULA:")
+            self.txt_ci.setText(cliente[1])
+            self.txt_nombre.setText("NOMBRE:")
+            self.txt_nombre.setText(cliente[2])
+            self.txt_descripcion.setText("N/A")
+        self.show()
     
     def fill_table(self, cuerpo_productos):
 
@@ -94,6 +117,15 @@ class Dialog_movimiento(QtWidgets.QDialog):
         self.txt_descripcion.setReadOnly(True)
         self.txt_descripcion.setText("N/A")
         grid_info.addWidget(self.txt_descripcion, 2, 1, 1, 2)
+
+        label_user = QtWidgets.QLabel("EMPLEADO:")
+        label_user.setFont(self.mainApp.font_m)
+        grid_info.addWidget(label_user, 3, 0)
+
+        self.txt_user = QtWidgets.QLineEdit()
+        self.txt_user.setFont(self.mainApp.font_m)
+        self.txt_user.setReadOnly(True)
+        grid_info.addWidget(self.txt_user, 3, 1, 1, 2)
 
         self.table_productos = QtWidgets.QTableWidget()
         self.table_productos.setFont(self.mainApp.font_m)
