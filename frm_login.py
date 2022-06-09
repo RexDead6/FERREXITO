@@ -23,7 +23,6 @@ class Frame_login(QtWidgets.QFrame):
         self.mainApp.nombre  = data[2]
         self.mainApp.id_user = data[0]
         self.mainApp.cargo   = int(data[3])
-        self.mainApp.change_frame("venta")
 
         self.mainApp.action_compra.setVisible(True)
         self.mainApp.logistica_menu.setEnabled(True)
@@ -39,6 +38,11 @@ class Frame_login(QtWidgets.QFrame):
             self.mainApp.logistica_menu.setEnabled(False)
             self.mainApp.administracion_menu.setEnabled(False)
         self.mainApp.menubar.setVisible(True)
+
+        if self.mainApp.cargo < 2:
+            self.mainApp.change_frame("inicio")
+        else:
+            self.mainApp.change_frame("venta")
 
     def create_widgets(self):
         self.setStyleSheet("QFrame{background-color: #C6C38B; margin:0}")

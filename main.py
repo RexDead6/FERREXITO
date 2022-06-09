@@ -12,6 +12,7 @@ from frm_tabla_movimientos import Tabla_movimientos
 from frm_devolucion import Frame_devolucion
 from frm_inventario import Frame_inventario
 from frm_auditoria import Tabla_auditoria
+from frm_inicio import Frame_inicio
 
 class windows_main(QtWidgets.QMainWindow):
 
@@ -87,6 +88,9 @@ class windows_main(QtWidgets.QMainWindow):
         elif f == "auditoria":
             self.stack.setCurrentIndex(8)
             self.frame_auditoria.add_data_table()
+        elif f == "inicio":
+            self.stack.setCurrentIndex(9)
+            self.frame_inicio.add_data_table()
 
     def create_widgets(self):
         self.setWindowTitle("FERREXITO")
@@ -119,6 +123,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.frame_devolucion         = Frame_devolucion(args=self)
         self.frame_inventario         = Frame_inventario(args=self)
         self.frame_auditoria          = Tabla_auditoria(args=self)
+        self.frame_inicio             = Frame_inicio(args=self)
 
         # STACK DE CADA FRAME
         self.stack = QtWidgets.QStackedWidget()
@@ -131,6 +136,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.stack.addWidget(self.frame_devolucion)         # 6
         self.stack.addWidget(self.frame_inventario)         # 7
         self.stack.addWidget(self.frame_auditoria)          # 8
+        self.stack.addWidget(self.frame_inicio)             # 9
         layout_main.addWidget(self.stack)
 
         # MENU BAR
@@ -148,6 +154,9 @@ class windows_main(QtWidgets.QMainWindow):
         self.facturacion_menu.addAction(self.action_compra)
         self.facturacion_menu.addAction(self.action_venta)
 
+        self.action_inicio = QtWidgets.QAction("INICIO", self)
+        self.action_inicio.triggered.connect(lambda: self.change_frame("inicio"))
+
         self.action_productos = QtWidgets.QAction("PRODUCTOS", self)
         self.action_productos.triggered.connect(lambda: self.change_frame("productos"))
 
@@ -155,6 +164,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.action_movimientos.triggered.connect(lambda: self.change_frame("movimientos"))
 
         self.logistica_menu = self.menubar.addMenu("LOGÍSTICA")
+        self.logistica_menu.addAction(self.action_inicio)
         self.logistica_menu.addAction(self.action_productos)
         self.logistica_menu.addAction(self.action_movimientos)
 
