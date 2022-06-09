@@ -759,6 +759,29 @@ public final class DATA_CLASS {
         }
     }
     
+    public ArrayList<String[]> LIKE_SENTENCE_AUDITORIA(String query){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                ResultSet rs = stmt.executeQuery(query);     
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[4];
+                    data[0] = rs.getString("ID");
+                    data[1] = rs.getString("descripcion");
+                    data[2] = rs.getString("fecha");
+                    data[3] = rs.getString("ID_personal");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN LIKE_SENTENCE: "+e);
+            return null;
+        }
+    }
+    
     private void INSERT_AUDITORIA(String descripcion, String ref, String id_usuario){
         try{
             try (Statement stmt = DB.con.createStatement()) {
@@ -771,6 +794,31 @@ public final class DATA_CLASS {
             System.out.println("ERROR IN INSERT_AUDITORIA: "+e);
         }
     }
+    
+    public ArrayList<String[]> SELECT_AUDITORIA(){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                ResultSet rs = stmt.executeQuery("SELECT * FROM auditoria");
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[9];
+                    data[0] = rs.getString("ID");
+                    data[1] = rs.getString("descripcion");
+                    data[2] = rs.getString("fecha");
+                    data[3] = rs.getString("id_personal");
+                    
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN LIKE_SENTENCE: "+e);
+            return null;
+        }
+    }
+    
 //-----------------------------------------------------------------------------------------------------------------------------//
     
     public String format_decimal(BigDecimal n){

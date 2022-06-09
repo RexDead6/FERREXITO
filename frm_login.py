@@ -25,6 +25,19 @@ class Frame_login(QtWidgets.QFrame):
         self.mainApp.cargo   = int(data[3])
         self.mainApp.change_frame("venta")
 
+        self.mainApp.action_compra.setVisible(True)
+        self.mainApp.logistica_menu.setEnabled(True)
+        self.mainApp.action_empleados.setVisible(True)
+        self.mainApp.action_inventario.setVisible(True)
+        self.mainApp.administracion_menu.setEnabled(True)
+
+        if self.mainApp.cargo == 1:
+            self.mainApp.action_empleados.setVisible(False)
+            self.mainApp.action_inventario.setVisible(False)
+        elif self.mainApp.cargo == 2:
+            self.mainApp.action_compra.setVisible(False)
+            self.mainApp.logistica_menu.setEnabled(False)
+            self.mainApp.administracion_menu.setEnabled(False)
         self.mainApp.menubar.setVisible(True)
 
     def create_widgets(self):

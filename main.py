@@ -11,6 +11,7 @@ from frm_tabla_empleados import Tabla_empleados
 from frm_tabla_movimientos import Tabla_movimientos
 from frm_devolucion import Frame_devolucion
 from frm_inventario import Frame_inventario
+from frm_auditoria import Tabla_auditoria
 
 class windows_main(QtWidgets.QMainWindow):
 
@@ -83,10 +84,14 @@ class windows_main(QtWidgets.QMainWindow):
         elif f == "inventario":
             self.stack.setCurrentIndex(7)
             self.setWindowTitle("AJUSTE DE INVENTARIO - {}".format(self.nombre))
+        elif f == "auditoria":
+            self.stack.setCurrentIndex(8)
+            self.frame_auditoria.add_data_table()
 
     def create_widgets(self):
         self.setWindowTitle("FERREXITO")
         self.setStyleSheet("QPushButton{padding: 10px}")
+        self.setWindowIcon(QtGui.QIcon('img/icon.png'))
 
         cw = QtWidgets.QWidget()
         self.setCentralWidget(cw)
@@ -113,6 +118,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.frame_personal           = Tabla_empleados(args=self)
         self.frame_devolucion         = Frame_devolucion(args=self)
         self.frame_inventario         = Frame_inventario(args=self)
+        self.frame_auditoria          = Tabla_auditoria(args=self)
 
         # STACK DE CADA FRAME
         self.stack = QtWidgets.QStackedWidget()
@@ -124,6 +130,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.stack.addWidget(self.frame_personal)           # 5
         self.stack.addWidget(self.frame_devolucion)         # 6
         self.stack.addWidget(self.frame_inventario)         # 7
+        self.stack.addWidget(self.frame_auditoria)          # 8
         layout_main.addWidget(self.stack)
 
         # MENU BAR
@@ -131,49 +138,49 @@ class windows_main(QtWidgets.QMainWindow):
         self.menubar.setVisible(False)
         self.setMenuBar(self.menubar)
 
-        action_compra = QtWidgets.QAction("COMPRA (PROVEEDORES)", self)
-        action_compra.triggered.connect(lambda: self.change_frame("compra"))
+        self.action_compra = QtWidgets.QAction("COMPRA (PROVEEDORES)", self)
+        self.action_compra.triggered.connect(lambda: self.change_frame("compra"))
 
-        action_venta = QtWidgets.QAction("VENTA (CLIENTES)", self)
-        action_venta.triggered.connect(lambda: self.change_frame("venta"))
+        self.action_venta = QtWidgets.QAction("VENTA (CLIENTES)", self)
+        self.action_venta.triggered.connect(lambda: self.change_frame("venta"))
 
-        facturacion_menu = self.menubar.addMenu("FACTURACION")
-        facturacion_menu.addAction(action_compra)
-        facturacion_menu.addAction(action_venta)
+        self.facturacion_menu = self.menubar.addMenu("FACTURACION")
+        self.facturacion_menu.addAction(self.action_compra)
+        self.facturacion_menu.addAction(self.action_venta)
 
-        action_productos = QtWidgets.QAction("PRODUCTOS", self)
-        action_productos.triggered.connect(lambda: self.change_frame("productos"))
+        self.action_productos = QtWidgets.QAction("PRODUCTOS", self)
+        self.action_productos.triggered.connect(lambda: self.change_frame("productos"))
 
-        action_movimientos = QtWidgets.QAction("MOVIMIENTOS", self)
-        action_movimientos.triggered.connect(lambda: self.change_frame("movimientos"))
+        self.action_movimientos = QtWidgets.QAction("MOVIMIENTOS", self)
+        self.action_movimientos.triggered.connect(lambda: self.change_frame("movimientos"))
 
-        logistica_menu = self.menubar.addMenu("LOGÍSTICA")
-        logistica_menu.addAction(action_productos)
-        logistica_menu.addAction(action_movimientos)
+        self.logistica_menu = self.menubar.addMenu("LOGÍSTICA")
+        self.logistica_menu.addAction(self.action_productos)
+        self.logistica_menu.addAction(self.action_movimientos)
 
-        action_empleados = QtWidgets.QAction("EMPLEADOS", self)
-        action_empleados.triggered.connect(lambda: self.change_frame("empleados"))
+        self.action_empleados = QtWidgets.QAction("EMPLEADOS", self)
+        self.action_empleados.triggered.connect(lambda: self.change_frame("empleados"))
 
-        action_auditoria = QtWidgets.QAction("AUDITORIA", self)
-        #action_auditoria.triggered.connect(lambda: self.change_frame(""))
+        self.action_auditoria = QtWidgets.QAction("AUDITORIA", self)
+        self.action_auditoria.triggered.connect(lambda: self.change_frame("auditoria"))
 
-        action_inventario = QtWidgets.QAction("AJUSTES DE INV.", self)
-        action_inventario.triggered.connect(lambda: self.change_frame("inventario"))
+        self.action_inventario = QtWidgets.QAction("AJUSTES DE INV.", self)
+        self.action_inventario.triggered.connect(lambda: self.change_frame("inventario"))
 
-        administracion_menu = self.menubar.addMenu("ADMINISTRACION")
-        administracion_menu.addAction(action_empleados)
-        administracion_menu.addAction(action_auditoria)
-        administracion_menu.addAction(action_inventario)
+        self.administracion_menu = self.menubar.addMenu("ADMINISTRACION")
+        self.administracion_menu.addAction(self.action_empleados)
+        self.administracion_menu.addAction(self.action_auditoria)
+        self.administracion_menu.addAction(self.action_inventario)
 
-        action_cerrar_sesion = QtWidgets.QAction("CERRAR SESIÓN", self)
-        action_cerrar_sesion.triggered.connect(lambda: self.change_frame("login"))
+        self.action_cerrar_sesion = QtWidgets.QAction("CERRAR SESIÓN", self)
+        self.action_cerrar_sesion.triggered.connect(lambda: self.change_frame("login"))
 
-        action_cerrar_app = QtWidgets.QAction("CERRAR", self)
-        action_cerrar_app.triggered.connect(self.close)
+        self.action_cerrar_app = QtWidgets.QAction("CERRAR", self)
+        self.action_cerrar_app.triggered.connect(self.close)
 
-        sesion_menu = self.menubar.addMenu("SESIÓN")
-        sesion_menu.addAction(action_cerrar_sesion)
-        sesion_menu.addAction(action_cerrar_app)
+        self.sesion_menu = self.menubar.addMenu("SESIÓN")
+        self.sesion_menu.addAction(self.action_cerrar_sesion)
+        self.sesion_menu.addAction(self.action_cerrar_app)
 
 app = QtWidgets.QApplication([])
 application = windows_main()

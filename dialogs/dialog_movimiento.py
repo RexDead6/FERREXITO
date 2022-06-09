@@ -71,6 +71,7 @@ class Dialog_movimiento(QtWidgets.QDialog):
         layout_main.setSpacing(0)
         self.setModal(True)
         self.setLayout(layout_main)
+        self.setWindowTitle("DETALLES DE MOVIMIENTO")
 
         self.frame_info = QtWidgets.QFrame()
         layout_info = QtWidgets.QVBoxLayout()
