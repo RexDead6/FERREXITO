@@ -58,9 +58,27 @@ class Frame_inicio(QtWidgets.QFrame):
         label_titulo = QtWidgets.QLabel("ACCESOS RÁPIDOS")
         label_titulo.setFont(self.mainApp.font_m)
         
-
         self.btn_facturacion = QtWidgets.QPushButton("FACTURACION")
         self.btn_facturacion.setFont(self.mainApp.font_m)
         self.btn_facturacion.clicked.connect(lambda: self.mainApp.change_frame("venta"))
         layout_botones.addWidget(self.btn_facturacion)
-        layout_botones.setAlignment(self.btn_facturacion, QtCore.Qt.AlignTop)
+        
+        self.btn_compra = QtWidgets.QPushButton("COMPRA A PROVEEDORES")
+        self.btn_compra.setFont(self.mainApp.font_m)
+        self.btn_compra.clicked.connect(lambda: self.mainApp.change_frame("compra"))
+        layout_botones.addWidget(self.btn_compra)
+        
+        self.btn_mov = QtWidgets.QPushButton("MOVIMIENTOS")
+        self.btn_mov.setFont(self.mainApp.font_m)
+        self.btn_mov.clicked.connect(lambda: self.mainApp.change_frame("movimientos"))
+        layout_botones.addWidget(self.btn_mov)
+        
+        self.btn_prod = QtWidgets.QPushButton("PRODUCTOS")
+        self.btn_prod.setFont(self.mainApp.font_m)
+        self.btn_prod.clicked.connect(lambda: self.mainApp.change_frame("productos"))
+        layout_botones.addWidget(self.btn_prod)
+        
+        self.btn_auditoria = QtWidgets.QPushButton("AUDITORIA")
+        self.btn_auditoria.setFont(self.mainApp.font_m)
+        self.btn_auditoria.clicked.connect(lambda: self.mainApp.change_frame("auditoria"))
+        layout_botones.addWidget(self.btn_auditoria)

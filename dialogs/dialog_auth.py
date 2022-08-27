@@ -30,7 +30,7 @@ class Dialog_auth(QtWidgets.QDialog):
             return False
 
         if int(data[3]) <= 1:
-            self.mainApp.frame_devolucion.id_user = data[0]
+            self.mainApp.temp_user = data[0]
             self.doSuccess()
         else:
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "USUARIO SIN PERMISOS VÁLIDOS")

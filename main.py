@@ -1,8 +1,8 @@
-from ast import arg
 from PyQt5 import QtCore, QtWidgets, QtGui
 import sys
 import jpype
 
+from class_reports import Reports
 from frm_compra import Frame_compra
 from frm_facturacion import Frame_facturacion
 from frm_login import Frame_login
@@ -13,6 +13,7 @@ from frm_devolucion import Frame_devolucion
 from frm_inventario import Frame_inventario
 from frm_auditoria import Tabla_auditoria
 from frm_inicio import Frame_inicio
+from dialogs.dialog_ajustes import Dialog_ajustes
 
 class windows_main(QtWidgets.QMainWindow):
 
@@ -21,11 +22,46 @@ class windows_main(QtWidgets.QMainWindow):
     cargo        = 0
     block_change = False
     nombre       = ""
+    temp_user    = ""
 
     def __init__(self):
         super(windows_main, self).__init__()
         self.initializate_java_class()
         self.create_widgets()
+
+    def reporte_venta(self, num_factura):
+        data_raw = self.DATA_SYSTEM.SELECT_FACTURA(num_factura)
+        data = {
+            "ci": data_raw[0][2],
+            "cliente": data_raw[0][3],
+            "direccion": data_raw[0][4],
+            "n_factura": data_raw[0][0],
+            "fecha_factura": self.formato_fecha(data_raw[0][1]),
+            "subtotal": self.formato_moneda(float(data_raw[0][11])),
+            "iva_porcent": self.formato_moneda(float(data_raw[0][9])),
+            "iva": self.formato_moneda(float(data_raw[0][10])),
+            "total": self.formato_moneda(float(data_raw[0][12]))
+        }
+
+        productos = list()
+
+        for list_data in data_raw:
+            producto = {
+                "descripcion": list_data[5],
+                "cantidad": list_data[7],
+                "costo": self.formato_moneda(float(list_data[6])),
+                "monto": self.formato_moneda(float(list_data[8]))
+            }
+            productos.append(producto)
+
+        data["productos"] = productos
+        
+        return Reports(
+        "venta_template.html", 
+        data).execute()
+        
+    def setTempUser(self, id):
+        self.temp_user = id
 
     def initializate_java_class(self):
         jpype.startJVM(classpath=['java/DATA_SYSTEM.jar'], convertStrings=True)
@@ -91,6 +127,8 @@ class windows_main(QtWidgets.QMainWindow):
         elif f == "inicio":
             self.stack.setCurrentIndex(9)
             self.frame_inicio.add_data_table()
+        elif f == "ajustes":
+            self.dialog_ajustes = Dialog_ajustes(args=self)
 
     def create_widgets(self):
         self.setWindowTitle("FERREXITO")
@@ -177,10 +215,14 @@ class windows_main(QtWidgets.QMainWindow):
         self.action_inventario = QtWidgets.QAction("AJUSTES DE INV.", self)
         self.action_inventario.triggered.connect(lambda: self.change_frame("inventario"))
 
+        self.action_ajustes = QtWidgets.QAction("AJUSTES GENERALES", self)
+        self.action_ajustes.triggered.connect(lambda: self.change_frame("ajustes"))
+
         self.administracion_menu = self.menubar.addMenu("ADMINISTRACION")
         self.administracion_menu.addAction(self.action_empleados)
         self.administracion_menu.addAction(self.action_auditoria)
         self.administracion_menu.addAction(self.action_inventario)
+        self.administracion_menu.addAction(self.action_ajustes)
 
         self.action_cerrar_sesion = QtWidgets.QAction("CERRAR SESIÓN", self)
         self.action_cerrar_sesion.triggered.connect(lambda: self.change_frame("login"))

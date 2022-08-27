@@ -48,8 +48,11 @@ class Frame_compra(QtWidgets.QFrame):
         self.msg.setText(msg)
 
     def search_barcode(self):
-        self.data = self.mainApp.DATA_SYSTEM.SELECT_PRODUCTO(self.txt_barcode.text())
+        if self.txt_barcode.text() == "":
+            return None
         
+        self.data = self.mainApp.DATA_SYSTEM.SELECT_PRODUCTO(self.txt_barcode.text())
+
         if self.data == None:
             self.msg.setText("PRODUCTO SIN REGISTRAR")
             self.txt_descripcion.setEnabled(True)
@@ -93,7 +96,7 @@ class Frame_compra(QtWidgets.QFrame):
             self.msg.setText("ERROR AL REGISTRAR, INTENTE DE NUEVO")
 
     def change_txt_compra(self):
-        aumento = int(self.mainApp.DATA_SYSTEM.SELECT_AJUSTE("AUMENTO_VENTA"))
+        aumento = float(self.mainApp.DATA_SYSTEM.SELECT_AJUSTE("AUMENTO_VENTA"))
         monto_compra = float(self.txt_costo_compra.text().replace(".", "").replace(",", "."))
         monto_venta = ((aumento/100) * monto_compra) + monto_compra
         self.txt_costo_venta.setText(self.mainApp.formato_moneda(monto_venta))
@@ -145,6 +148,7 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_total.setText(self.mainApp.formato_moneda(TOTAL + float(self.txt_total.text().replace(".", "").replace(",", "."))))
 
         self.txt_barcode.setText("")
+        self.txt_barcode.setEnabled(True)
         self.txt_descripcion.setText("")
         self.txt_descripcion.setReadOnly(False)
         self.txt_descripcion.setEnabled(False)

@@ -8,6 +8,14 @@ class Tabla_auditoria(QtWidgets.QFrame):
         super(Tabla_auditoria, self).__init__()
         self.mainApp = kwargs['args']
         self.create_widgets()
+        
+    def buscar(self):
+        query = "SELECT * FROM auditoria WHERE "
+        
+        date1 = self.date_inicio.dateTime().date().toString("yyyy-MM-dd")
+        date2 = self.date_fin.dateTime().date().toString("yyyy-MM-dd")
+        
+        query = query+ "fecha BETWEEN '{}' AND '{}'"
 
     def add_data_table(self):
         data = self.mainApp.DATA_SYSTEM.SELECT_AUDITORIA()
@@ -53,39 +61,44 @@ class Tabla_auditoria(QtWidgets.QFrame):
         layout_botones = QtWidgets.QVBoxLayout()
         layout_horizontal.addLayout(layout_botones)
         
+        label_user = QtWidgets.QLabel("EMPLEADO:")
+        label_user.setFont(self.mainApp.font_m)
+        #layout_botones.addWidget(label_user)
+        
         self.txt_buscar = QtWidgets.QLineEdit()
         self.txt_buscar.setFont(self.mainApp.font_m)
         self.txt_buscar.setMaximumWidth(200)
         #self.txt_buscar.textChanged.connect(self.input_buscar)
-        layout_botones.addWidget(self.txt_buscar)
+        #layout_botones.addWidget(self.txt_buscar)
 
         self.box_accion = QtWidgets.QComboBox()
         self.box_accion.addItem("SIN ESPECIFICAR")
         self.box_accion.setFont(self.mainApp.font_m)
         self.box_accion.setMaximumWidth(200)
         #self.box_accion.currentIndexChanged.connect(self.onCurrentIndexComboTipo)
-        layout_botones.addWidget(self.box_accion)
+        #layout_botones.addWidget(self.box_accion)
 
         label_inicio = QtWidgets.QLabel("INICIO:")
         label_inicio.setFont(self.mainApp.font_m)
-        layout_botones.addWidget(label_inicio)
+        #layout_botones.addWidget(label_inicio)
 
         self.date_inicio = QtWidgets.QDateEdit(calendarPopup=True)
         self.date_inicio.setFont(self.mainApp.font_m)
         self.date_inicio.setDateTime(QtCore.QDateTime.currentDateTime())
-        layout_botones.addWidget(self.date_inicio)
+        #layout_botones.addWidget(self.date_inicio)
 
         label_fin = QtWidgets.QLabel("FIN:")
         label_fin.setFont(self.mainApp.font_m)
-        layout_botones.addWidget(label_fin)
+        #layout_botones.addWidget(label_fin)
 
         self.date_fin = QtWidgets.QDateEdit(calendarPopup=True)
         self.date_fin.setFont(self.mainApp.font_m)
         self.date_fin.setDateTime(QtCore.QDateTime.currentDateTime())
-        layout_botones.addWidget(self.date_fin)
+        #layout_botones.addWidget(self.date_fin)
 
         self.btn_buscar = QtWidgets.QPushButton("BUSCAR")
         self.btn_buscar.setFont(self.mainApp.font_m)
-        layout_botones.addWidget(self.btn_buscar)
+        self.btn_buscar.clicked.connect(self.buscar)
+        #layout_botones.addWidget(self.btn_buscar)
 
         layout_botones.addStretch()

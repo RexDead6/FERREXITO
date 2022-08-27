@@ -1,19 +1,25 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
 from dialogs.dialog_cobranza import Dialog_cobranza
 from dialogs.dialog_registro_cliente import Dialog_cliente
 from dialogs.dialog_consultar import Dialog_consultar
 from dialogs.dialog_auth import Dialog_auth
 
+import class_reports
+
 class Frame_facturacion(QtWidgets.QFrame):
     
     mainApp = None
     id_prod = None
+    id_user_cierre = 0
 
     def __init__(self, *args, **kwargs):
         super(Frame_facturacion, self).__init__()
         self.mainApp = kwargs['args']
         self.create_widgets()
+
+        self.msg = QMessageBox()
 
     def search_cliente(self):
         cliente = self.mainApp.DATA_SYSTEM.SELECT_CLIENTE(self.txt_ci.text())
@@ -77,7 +83,6 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.txt_barcode.setFocus()
 
     def cobrar(self):
-
         if float(self.txt_total.text().replace(".", "").replace(",", ".")) <= 0.0:
             self.msg.setText("SIN ARTICULOS PARA COBRAR")
             return None
@@ -87,11 +92,41 @@ class Frame_facturacion(QtWidgets.QFrame):
 
     def open_devolucion(self):
         if self.mainApp.cargo <= 1:
-            self.mainApp.frame_devolucion.id_user = self.mainApp.id_user
+            self.mainApp.setTempUser(self.mainApp.id_user)
             self.mainApp.change_frame("devolucion")
         else:
             self.dialog_autenticar = Dialog_auth(mainApp=self.mainApp, success=lambda: self.mainApp.change_frame("devolucion"), error=None)
+    
+    def generar_cierre(self):
+        self.msg_cierre = QMessageBox()
+        self.msg_cierre.setText("¿DESEA GENERAR UN CIERRE DE CAJA?")
+        self.msg_cierre.setWindowTitle("::GENERAR CIERRE::")
+        self.msg_cierre.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
 
+        valueCLicked = self.msg_cierre.exec()
+        if valueCLicked == QMessageBox.Ok:
+            ventas = self.mainApp.DATA_SYSTEM.SELECT_VENTA_CIERRE()
+            if len(ventas) <= 0:
+                QMessageBox.critical(self.msg, "::INFORMACION::", "IMPOSIBLE GENERAR CIERRE\nNO SE ENCONTRARON VENTAS EN EL SISTEMA")
+                return None
+
+            print("temp: {}".format(self.mainApp.temp_user))
+            cierre = self.mainApp.DATA_SYSTEM.UPDATE_VENTA_CIERRE(str(self.mainApp.temp_user))
+
+            if cierre != 0:
+                #class_reports.generarCierrePDF(cierre)
+                QMessageBox.information(self.msg, "::CIERRE::", "CIERRE #{} GENERADO CON ÉXITO".format(cierre))
+            else:
+                QMessageBox.critical(self.msg, "::CIERRE::", "ERROR AL GENERAR EL CIERRE")
+    
+    def open_generar_cierre(self):
+        if self.mainApp.cargo <= 1:
+            print("user_id: {}".format(self.mainApp.id_user))
+            self.mainApp.setTempUser(self.mainApp.id_user)
+            self.generar_cierre()
+        else:
+            self.dialog_autenticar = Dialog_auth(mainApp=self.mainApp, success=self.generar_cierre, error=None)
+            
     def delete_a_row(self):
         try:
             self.txt_total.setText(self.mainApp.formato_moneda(float(self.txt_total.text().replace(".", "").replace(",", ".")) - float(self.table_productos.item(0, 4).text().replace(".", "").replace(",", "."))))
@@ -268,6 +303,7 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.btn_cierre.setFont(self.mainApp.font_m)
         self.btn_cierre.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_cierre.setMinimumHeight(80)
+        self.btn_cierre.clicked.connect(self.open_generar_cierre)
         grid_botones.addWidget(self.btn_cierre, 2, 1)
 
         vlayout_botones.addStretch()

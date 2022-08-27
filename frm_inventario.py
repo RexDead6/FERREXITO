@@ -160,6 +160,25 @@ class Frame_inventario(QtWidgets.QFrame):
         self.msg.setFont(font_msg)
         self.msg.setAlignment(QtCore.Qt.AlignCenter)
         vlayout_botones.addWidget(self.msg)
+
+        label_manejo =  QtWidgets.QLabel("MANEJO:")
+        label_manejo.setFont(self.mainApp.font_m)
+
+        self.box_manejo = QtWidgets.QComboBox()
+        self.box_manejo.addItem("---SELECCIONE---")
+        self.box_manejo.addItem("AGREGAR")
+        self.box_manejo.addItem("SUBTRAER")
+        self.box_manejo.setFont(self.mainApp.font_m)
+        form_layout.addRow(label_manejo, self.box_manejo)
+
+        label_descripcion_inv = QtWidgets.QLabel("DESCRIPCION DE AJUSTE:")
+        label_descripcion_inv.setFont(self.mainApp.font_m)
+
+        self.txt_descripcion_inv = QtWidgets.QLineEdit()
+        self.txt_descripcion_inv.setFont(self.mainApp.font_m)
+        self.txt_descripcion_inv.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_descripcion_inv, lambda: self.txt_barcode.setFocus(), context=QtCore.Qt.WidgetShortcut)
+        self.txt_descripcion_inv.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_descripcion_inv, lambda: self.txt_barcode.setFocus(), context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_descripcion_inv, self.txt_descripcion_inv)
         
         label_barcode = QtWidgets.QLabel("CÓDIGO DE BARRA:")
         label_barcode.setFont(self.mainApp.font_m)
@@ -196,23 +215,6 @@ class Frame_inventario(QtWidgets.QFrame):
         self.txt_cantidad.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_cantidad, self.enter_cantidad, context=QtCore.Qt.WidgetShortcut)
         self.txt_cantidad.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_cantidad, self.enter_cantidad, context=QtCore.Qt.WidgetShortcut)
         form_layout.addRow(label_cantidad, self.txt_cantidad)
-
-        label_manejo =  QtWidgets.QLabel("MANEJO:")
-        label_manejo.setFont(self.mainApp.font_m)
-
-        self.box_manejo = QtWidgets.QComboBox()
-        self.box_manejo.addItem("---SELECCIONE---")
-        self.box_manejo.addItem("AGREGAR")
-        self.box_manejo.addItem("SUBTRAER")
-        self.box_manejo.setFont(self.mainApp.font_m)
-        form_layout.addRow(label_manejo, self.box_manejo)
-
-        label_descripcion_inv = QtWidgets.QLabel("DESCRIPCION DE AJUSTE:")
-        label_descripcion_inv.setFont(self.mainApp.font_m)
-
-        self.txt_descripcion_inv = QtWidgets.QLineEdit()
-        self.txt_descripcion_inv.setFont(self.mainApp.font_m)
-        form_layout.addRow(label_descripcion_inv, self.txt_descripcion_inv)
 
         hlayout_main.addLayout(vlayout_botones)
         vlayout_botones.addLayout(form_layout)

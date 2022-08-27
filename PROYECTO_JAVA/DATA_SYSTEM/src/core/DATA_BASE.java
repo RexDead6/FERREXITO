@@ -58,6 +58,7 @@ public final class DATA_BASE {
             rs = stmt.executeQuery("SELECT * FROM proveedor;");
             rs = stmt.executeQuery("SELECT * FROM venta;");
             rs = stmt.executeQuery("SELECT * FROM auditoria;");
+            rs = stmt.executeQuery("SELECT * FROM cierres;");
             
         } catch (SQLException ex) {
             if (ex.toString().substring(74, 87).equals("no such table")){
@@ -161,7 +162,7 @@ public final class DATA_BASE {
             "	`personal` INT(11) NOT NULL,\n" +
             "	`cliente` INT(11) NOT NULL,\n" +
             "	`fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,\n"+
-            "   `cierre` INT(11) NULL);\n" +
+            "   `cierre` INT(11) DEFAULT 0);\n" +
                     
             "CREATE TABLE `cuerpo` (\n" +
             "	`ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
@@ -194,13 +195,20 @@ public final class DATA_BASE {
             "   `valor` VARCHAR(50) NOT NULL);\n" +
             
             "INSERT INTO ajustes (clave, valor) VALUES ('IVA', '16');\n" +
-            "INSERT INTO ajustes (clave, valor) VALUES ('AUMENTO_VENTA', '45');\n"+
-            
+            "INSERT INTO ajustes (clave, valor) VALUES ('AUMENTO_VENTA', '45');\n"+       
+            "INSERT INTO ajustes (clave, valor) VALUES ('path_pdf', 'reportes');\n"+
+                    
             "CREATE TABLE `auditoria` (\n"+
             "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"+
             "   `descripcion` VARCHAR(50) NOT NULL DEFAULT '',\n"+
             "   `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,\n"+
-            "   `ID_personal` INT(11) NOT NULL);";
+            "   `ID_personal` INT(11) NOT NULL);"+
+            
+            "CREATE TABLE `cierres`(\n"+
+            "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"+
+            "   `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,\n"+
+            "   `id_personal` INTEGER NOT NULL);";
+            
                         
             System.out.println(sql);
             stmt.executeUpdate(sql);

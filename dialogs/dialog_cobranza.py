@@ -2,6 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import jpype
 
 from class_secundary import lineAmount
+from dialogs.dialog_reportView import Dialog_reportView
 
 class Dialog_cobranza(QtWidgets.QDialog):
 
@@ -71,12 +72,18 @@ class Dialog_cobranza(QtWidgets.QDialog):
             if self.mainApp.frame_facturacion.txt_ci.text() == "-": ci = "0"
             ref = self.mainApp.DATA_SYSTEM.MOVIMIENTO(1, ci, self.mainApp.id_user, self.mainApp.frame_facturacion.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio, metodo, ref, monto)
             if ref != "false":
+                if self.mainApp.reporte_venta(ref):
+                    self.mainApp.frame_facturacion.default_forms()
+                    self.dialog_test = Dialog_reportView(args=(self.mainApp, f"venta_{ref}.pdf"))
+                    self.dialog_test.show()
+                    self.close()
+                '''
                 text_data = "{:<25}{:>25}".format("REFERENCIA:", ref)
                 text_data = text_data + "\n{:<25}{:>25}".format("CLIENTE:", self.mainApp.frame_facturacion.txt_nombre.text())
                 text_data = text_data + "\n{:<25}{:>25}".format("MONTO:", self.mainApp.frame_facturacion.txt_total.text()+" Bs")
                 self.label_data.setText(text_data)
                 self.stack.setCurrentIndex(1)
-                self.mainApp.frame_facturacion.default_forms()
+                '''
         else:
             self.txt_monto.setText("{:.2f}".format(self.TOTAL_PAGAR))
             self.txt_monto.setFocus()

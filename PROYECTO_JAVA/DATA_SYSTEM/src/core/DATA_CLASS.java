@@ -36,6 +36,35 @@ public final class DATA_CLASS {
         }
     }
     
+    
+    public boolean UPDATE_AJUSTE(String clave, String valor){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "UPDATE ajustes SET valor = '"+valor+"' WHERE clave = '"+clave+"'";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return true;
+        }catch(SQLException e){
+            System.out.println("ERROR UPATE_AJUSTE: "+e);
+            return false;
+        }
+    }
+    
+    public boolean UPDATE_USER_ADMIN(String CI, String clave){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "UPDATE personal SET `C.I.` = "+CI+" AND clave = '"+clave+"' WHERE cargo = 0;";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return true;
+        }catch(SQLException e){
+            System.out.println("ERROR UPDATE_USER_ADMIN: "+e);
+            return false;
+        }
+    }
+    
     public boolean INSERT_USER(String ci, String nombre, int cargo, String clave){
         try{
             try (Statement stmt = DB.con.createStatement()){
@@ -527,6 +556,110 @@ public final class DATA_CLASS {
         }
     }
     
+    public ArrayList<String[]> SELECT_VENTA_CIERRE(){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT * FROM venta WHERE estatus = 0 AND cierre = 0";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[7];
+                    data[0] = rs.getString("ID");
+                    data[1] = rs.getString("estatus");
+                    data[2] = rs.getString("referencia");
+                    data[3] = rs.getString("personal");
+                    data[4] = rs.getString("cliente");
+                    data[5] = rs.getString("fecha");
+                    data[6] = rs.getString("cierre");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_VENTA_CIERRE: "+e);
+            return null;
+        }
+    }
+    
+    public int UPDATE_VENTA_CIERRE(String id_personal){
+        try{
+            int id_cierre = 0;
+            try (Statement stmt = DB.con.createStatement()) {
+                String query = "INSERT INTO cierres (id_personal) VALUES ("+id_personal+")";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+                
+                query = "SELECT * FROM cierres WHERE ID = (SELECT MAX(ID) FROM cierres);";
+                ResultSet rs = stmt.executeQuery(query);
+                id_cierre = rs.getInt("ID");
+                
+                query = "UPDATE venta SET cierre = "+id_cierre+" WHERE estatus = 0 AND cierre = 0";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return id_cierre;
+        }catch(SQLException e){
+            System.out.println("ERROR IN UPDATE_PRODUCTO: "+e);
+            return 0;
+        }
+    }
+    
+    public ArrayList<String[]> SELECT_FACTURA(String num_factura){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT \n" +
+                               "       AA.referencia,\n" +
+                               "       AA.fecha,\n" +
+                               "       CC.CI,\n" +
+                               "       CC.nombre,\n" +
+                               "       CC.direccion,\n" +
+                               "       EE.descripcion,\n" +
+                               "       DD.precio_unitario,\n" +
+                               "       DD.cantidad,\n" +
+                               "       DD.precio_total as precio_producto,\n" +
+                               "       BB.porcent_IVA,\n" +
+                               "       BB.IVA,\n" +
+                               "       BB.subtotal,\n" +
+                               "       BB.total\n" +
+                               "FROM venta AS AA\n" +
+                               "INNER JOIN cuerpo AS BB ON BB.ID_encabezado = AA.ID\n" +
+                               "INNER JOIN cliente AS CC ON AA.cliente = CC.ID\n" +
+                               "INNER JOIN cuerpo_productos AS DD ON DD.ID_cuerpo = BB.ID\n" +
+                               "INNER JOIN producto AS EE ON DD.ID_producto = EE.ID\n" +
+                               "WHERE AA.referencia = '"+num_factura+"';";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[13];
+                    data[0] = rs.getString("referencia");
+                    data[1] = rs.getString("fecha");
+                    data[2] = rs.getString("CI");
+                    data[3] = rs.getString("nombre");
+                    data[4] = rs.getString("direccion");
+                    data[5] = rs.getString("descripcion");
+                    data[6] = rs.getString("precio_unitario");
+                    data[7] = rs.getString("cantidad");
+                    data[8] = rs.getString("precio_producto");
+                    data[9] = rs.getString("porcent_IVA");
+                    data[10] = rs.getString("IVA");
+                    data[11] = rs.getString("subtotal");
+                    data[12] = rs.getString("total");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_VENTA_CIERRE: "+e);
+            return null;
+        }
+    }
+    
     public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios){
         try{
             Statement stmt = DB.con.createStatement();
@@ -614,8 +747,8 @@ public final class DATA_CLASS {
             String iva_str = rs.getString("valor");
                         
             BigDecimal TOTAL     = new BigDecimal(TOTAL_STR);
-            BigDecimal TOTAL_IVA = TOTAL.divide(new BigDecimal(iva_str).multiply(new BigDecimal("0.01")).add(new BigDecimal("1.0")), 2, RoundingMode.HALF_DOWN);
-            BigDecimal SUBTOTAL  = TOTAL.subtract(TOTAL_IVA);
+            BigDecimal SUBTOTAL = TOTAL.divide(new BigDecimal(iva_str).multiply(new BigDecimal("0.01")).add(new BigDecimal("1.0")), 2, RoundingMode.HALF_DOWN);
+            BigDecimal TOTAL_IVA  = TOTAL.subtract(SUBTOTAL);
                         
             query = "INSERT INTO cuerpo (ID_encabezado, tipo, subtotal, porcent_IVA, IVA, total) "
                     + "VALUES ("+id_movimiento+", "+tipo+", '"+format_decimal(SUBTOTAL)+"', '"+iva_str+"', '"+format_decimal(TOTAL_IVA)+"', '"+format_decimal(TOTAL)+"');";
@@ -771,7 +904,7 @@ public final class DATA_CLASS {
                     data[0] = rs.getString("ID");
                     data[1] = rs.getString("descripcion");
                     data[2] = rs.getString("fecha");
-                    data[3] = rs.getString("ID_personal");
+                    data[3] = rs.getString("cargo");
                     data_raw.add(data);
                 }
                 return data_raw;

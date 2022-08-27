@@ -7,8 +7,7 @@ import jpype
 class Frame_devolucion(QtWidgets.QFrame):
     
     mainApp = None
-    id_user = 0
-
+    
     def __init__(self, *args, **kwargs):
         super(Frame_devolucion, self).__init__()
         self.mainApp = kwargs['args']
@@ -74,7 +73,7 @@ class Frame_devolucion(QtWidgets.QFrame):
             cantidad[i]  = int(self.table_productos.item(i, 3).text())
             precio[i]    = float(self.table_productos.item(i, 2).text().replace(".", "").replace(",", "."))
 
-        referencia = self.mainApp.DATA_SYSTEM.MOVIMIENTO(3, self.id_venta, self.id_user, self.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
+        referencia = self.mainApp.DATA_SYSTEM.MOVIMIENTO(3, self.id_venta, self.mainApp.temp_user, self.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
         
         if referencia != None:
             QMessageBox.information(self.msgBox, "::DEVOLUCIÓN EXITOSA::", "SU DEVOLUCION HA SIDO PROCESADA EXITOSAMENTE (REF: "+referencia+")")

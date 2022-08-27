@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body{
+
+            padding: 20px;
+        }
+
+        .titulo_factura{
+            color: brown;
+        }
+
+        .image_logo{
+            position: absolute;
+            max-width: 100px;
+            height: auto;
+            right: 20px;
+            top: 20px;
+        }
+
+        .header .header_head p,
+        .header .header_detalle .cliente p{
+            margin: 0;
+            font-size: 20px;
+        }
+    
+        .header .header_detalle{
+            display: -webkit-box; /* wkhtmltopdf uses this one */
+            display: flex;
+        }
+        
+        .header .header_detalle .detalle{
+            position: absolute;
+            top: 140px;
+            right: 20px;
+        }
+
+        .header .header_detalle .detalle span{
+            color: brown;
+            font-size: 18px;
+        }
+
+        .styled-table {
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.9em;
+            font-family: sans-serif;
+            min-width: 400px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+            width: 100%;
+        }
+
+        .styled-table thead tr {
+            background-color: brown;
+            color: #ffffff;
+            text-align: left;
+        }
+
+        .styled-table th,
+        .styled-table td {
+            padding: 12px 15px;
+            text-align: center;
+        }
+
+        .styled-table tbody tr {
+            border-bottom: 1px solid #dddddd;
+        }
+
+        .styled-table tbody tr:nth-of-type(even) {
+            background-color: #f3f3f3;
+        }
+
+        .styled-table tbody tr:last-of-type {
+            border-bottom: 2px solid brown;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header_head">
+            <div>
+                <h1 class="titulo_factura">FACTURA</h1>
+                <p>Ferrexito<p>
+                <p>Direccion</p>
+            </div>
+
+            <div>
+                <img class="image_logo" src="../img/logo.png">
+            </div>
+        </div>
+        <br>
+        <div class="header_detalle">
+            <div class="cliente">
+                <h3 class="titulo_factura">FACTURAR A</h3>
+                
+                    <p>27863198</p>
+                
+                <p>Luis Albarracin</p>
+                <p>MARACAY<p>
+            </div>
+
+            <div class="detalle">
+                <b><p><span>NÚMERO FACTURA: </span>00000000082</p></b>
+                <b><p><span>FECHA DE EXPEDICIÓN: </span>27/08/2022 20:44:34</p></b>
+            </div>
+        </div>
+    </div>
+
+    <table class="styled-table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>cantidad</th>
+                <th>costo</th>
+                <th>monto</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            
+                <tr>
+                
+                    <td>MARTILLO</td>
+                
+                    <td>5</td>
+                
+                    <td>30,00</td>
+                
+                    <td>150,00</td>
+                
+                </tr>
+            
+            <tr>
+                <td></td>
+                <td></td>
+                <td>Subtotal</td>
+                <td>129,31</td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td>IVA 16,00%</td>
+                <td>20,69</td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="titulo_factura"><b>TOTAL</b></td>
+                <td class="titulo_factura"><b>150,00 Bs</b></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>
