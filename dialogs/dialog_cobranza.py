@@ -74,8 +74,8 @@ class Dialog_cobranza(QtWidgets.QDialog):
             if ref != "false":
                 if self.mainApp.reporte_venta(ref):
                     self.mainApp.frame_facturacion.default_forms()
-                    self.dialog_test = Dialog_reportView(args=(self.mainApp, f"venta_{ref}.pdf"))
-                    self.dialog_test.show()
+                    self.dialog_report = Dialog_reportView(args=(self.mainApp, f"venta_{ref}.pdf"))
+                    self.dialog_report.show()
                     self.close()
                 '''
                 text_data = "{:<25}{:>25}".format("REFERENCIA:", ref)

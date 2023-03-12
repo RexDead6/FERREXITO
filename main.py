@@ -29,6 +29,45 @@ class windows_main(QtWidgets.QMainWindow):
         self.initializate_java_class()
         self.create_widgets()
 
+    def reporte_cierre(self, num_cierre):
+        data_raw = self.DATA_SYSTEM.SELECT_VENTA_CIERRE(str(num_cierre))
+
+        print(f"data_raw: {data_raw}")
+        data = {
+            "ci":data_raw[0][2],
+            "personal":data_raw[0][3],
+            "n_cierre":data_raw[0][0],
+            "fecha_cierre":self.formato_fecha(data_raw[0][1])
+        }
+
+        subtotal = 0.0
+        iva      = 0.0
+        total    = 0.0
+
+        facturas = list()
+        for factura in data_raw:
+
+            subtotal += float(factura[6])
+            iva += float(factura[7])
+            total += float(factura[8])
+
+            facturas.append({
+                "factura":factura[4],
+                "fecha":self.formato_fecha(factura[5]),
+                "subtotal": self.formato_moneda(factura[6]),
+                "iva": self.formato_moneda(factura[7]),
+                "total": self.formato_moneda(factura[8])
+            })
+        data['facturas'] = facturas
+        data['subtotal'] = self.formato_moneda(subtotal)
+        data['iva']      = self.formato_moneda(iva)
+        data['total']    = self.formato_moneda(total)
+
+        return Reports(
+            "cierre_template.html",
+            data
+        ).execute()
+
     def reporte_venta(self, num_factura):
         data_raw = self.DATA_SYSTEM.SELECT_FACTURA(num_factura)
         data = {
@@ -68,7 +107,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.DATA_SYSTEM = jpype.JClass("core.DATA_CLASS")()
 
     def formato_moneda(self, monto):
-        return "{:,.2f}".format(monto).replace(".", "#").replace(",", ".").replace("#", ",")
+        return "{:,.2f}".format(float(monto)).replace(".", "#").replace(",", ".").replace("#", ",")
 
     def formato_fecha(self, data):
         return "{}/{}/{} {}".format(data[8:10], data[5:7], data[:4], data[11:])

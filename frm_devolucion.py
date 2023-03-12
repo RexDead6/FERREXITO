@@ -62,6 +62,10 @@ class Frame_devolucion(QtWidgets.QFrame):
             self.table_productos.setItem(0,4, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(cuerpo_productos[i][5]))))
     
     def generar_devolucion(self):
+        if self.txt_detalle.text() == "":
+            QMessageBox.critical(self.msgBox, "::ATENCION::", "INGRESE EL DETALLE DE SU DEVOLUCION")
+            return
+
         productos_raw = jpype.JArray(jpype.JInt)
         cantidad_raw  = jpype.JArray(jpype.JInt)
         precio_raw    = jpype.JArray(jpype.JFloat)
@@ -73,7 +77,7 @@ class Frame_devolucion(QtWidgets.QFrame):
             cantidad[i]  = int(self.table_productos.item(i, 3).text())
             precio[i]    = float(self.table_productos.item(i, 2).text().replace(".", "").replace(",", "."))
 
-        referencia = self.mainApp.DATA_SYSTEM.MOVIMIENTO(3, self.id_venta, self.mainApp.temp_user, self.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
+        referencia = self.mainApp.DATA_SYSTEM.MOVIMIENTO(3, self.id_venta, self.mainApp.temp_user, self.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio, self.txt_detalle.text())
         
         if referencia != None:
             QMessageBox.information(self.msgBox, "::DEVOLUCIÓN EXITOSA::", "SU DEVOLUCION HA SIDO PROCESADA EXITOSAMENTE (REF: "+referencia+")")
@@ -123,6 +127,19 @@ class Frame_devolucion(QtWidgets.QFrame):
         layout_input.addWidget(self.btn_buscar)
 
         layout_input.addStretch()
+
+        layout_horizontal1 = QtWidgets.QHBoxLayout()
+        layout_main.addLayout(layout_horizontal1)
+
+        label_detalle = QtWidgets.QLabel("DETALLE: ")
+        label_detalle.setFont(self.mainApp.font_m)
+        layout_horizontal1.addWidget(label_detalle)
+
+        self.txt_detalle = QtWidgets.QLineEdit()
+        self.txt_detalle.setFont(self.mainApp.font_m)
+        layout_horizontal1.addWidget(self.txt_detalle)
+
+        layout_horizontal1.addStretch()
 
         self.frame_info = QtWidgets.QFrame()
         layout_info = QtWidgets.QVBoxLayout()

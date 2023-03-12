@@ -30,7 +30,10 @@ class Tabla_empleados(QtWidgets.QFrame):
         for i in range(len(data)):
             self.table_personal.insertRow(0)
             self.table_personal.setItem(0,0, QtWidgets.QTableWidgetItem(data[i][1]))
-            self.table_personal.setItem(0,1, QtWidgets.QTableWidgetItem(data[i][3]))
+            cargo = "Administrador"
+            if data[i][3] == "1": cargo = "Supervisor"
+            if data[i][3] == "2": cargo = "Operador"
+            self.table_personal.setItem(0,1, QtWidgets.QTableWidgetItem(cargo))
             self.table_personal.setItem(0,2, QtWidgets.QTableWidgetItem(data[i][2]))
 
         self.table_personal.resizeRowsToContents()

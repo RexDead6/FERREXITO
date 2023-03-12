@@ -18,33 +18,62 @@ class Dialog_personal(QtWidgets.QDialog):
         if self.IS_EDIT and self.mainApp.frame_personal.table_personal.selectionModel().hasSelection():
             row = self.mainApp.frame_personal.table_personal.currentRow()
             self.personal = self.mainApp.DATA_SYSTEM.SELECT_USER(self.mainApp.frame_personal.table_personal.item(row, 0).text())
+            self.txt_id.setText(self.personal[0])
             self.txt_ci.setText(self.personal[1])
+            self.txt_ci.setReadOnly(True)
             self.txt_nombre.setText(self.personal[2])
             self.box_cargo.setCurrentIndex(int(self.personal[3]))
+            self.label_pass_current.setVisible(True)
+            self.txt_pass_current.setVisible(True)
+        else:
+            self.label_pass_current.setVisible(False)
+            self.txt_pass_current.setVisible(False)
 
     def register_user(self):
         if self.txt_ci.text() == "" or self.box_cargo.currentIndex() == 0 or self.txt_nombre.text() == "" or self.txt_pass.text() == "" or self.txt_pass1.text() == "":
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "RELLENE TODOS LOS FORMULARIOS")
             return None
         
-        if self.txt_pass.text() != self.txt_pass1.text():
-            QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑAS NO COINCIDEN")
-            self.txt_pass.setText("")
-            self.txt_pass1.setText("")
-            self.txt_pass.setFocus()
-            return None
+        if not self.IS_EDIT:
+            if self.txt_pass.text() != self.txt_pass1.text():
+                QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑAS NO COINCIDEN")
+                self.txt_pass.setText("")
+                self.txt_pass1.setText("")
+                self.txt_pass.setFocus()
+                return None
 
-        if self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text()) != None:
-            QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "USUARIO YA HA SIDO REGISTRADO")
-            return None
+            if self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text()) != None:
+                QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "USUARIO YA HA SIDO REGISTRADO")
+                return None
 
-        SUCCESS = self.mainApp.DATA_SYSTEM.INSERT_USER(self.txt_ci.text(), self.txt_nombre.text(), self.box_cargo.currentIndex(), self.txt_pass.text())
-        if SUCCESS:
-            QMessageBox.information(self.msgBox, "::: OPERACIÓN EXITOSA :::", "USUARIO REGISTRADO EXITOSAMENTE")
-            self.mainApp.frame_personal.add_data_table()
-            self.close()
+            SUCCESS = self.mainApp.DATA_SYSTEM.INSERT_USER(self.txt_ci.text(), self.txt_nombre.text(), self.box_cargo.currentIndex(), self.txt_pass.text())
+            if SUCCESS:
+                QMessageBox.information(self.msgBox, "::: OPERACIÓN EXITOSA :::", "USUARIO REGISTRADO EXITOSAMENTE")
+                self.mainApp.frame_personal.add_data_table()
+                self.close()
+            else:
+                QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "ERROR AL REGISTRAR USUARIO, INTENTE DE NUEVO")
         else:
-            QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "ERROR AL REGISTRAR USUARIO, INTENTE DE NUEVO")
+            user = self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text(), self.txt_pass_current.text())
+            if user == None:
+                QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑA ACTUAL INCORRECTA")
+                return None
+
+            password = self.txt_pass_current.text()
+
+            if self.txt_pass1.text() != "" and self.txt_pass.text() != "":
+                if self.txt_pass.text() != self.txt_pass1.text():
+                    QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "CONTRASEÑA NUEVA NO COINCIDEN")
+                    return None
+                password = self.txt_pass.text()
+            SUCCESS = self.mainApp.DATA_SYSTEM.UPDATE_USER(self.txt_id.text(), self.txt_nombre.text(), str(self.box_cargo.currentIndex()), password)
+            if SUCCESS:
+                QMessageBox.information(self.msgBox, "::: OPERACIÓN EXITOSA :::", "USUARIO ACTUALIZADO EXITOSAMENTE")
+                self.mainApp.frame_personal.add_data_table()
+                self.close()
+            else:
+                QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "ERROR AL ACTUALIZAR USUARIO, INTENTE DE NUEVO")
+
 
     def create_widgets(self):
         self.setModal(True)
@@ -58,6 +87,11 @@ class Dialog_personal(QtWidgets.QDialog):
 
         form_layout = QtWidgets.QFormLayout()
         main_layout.addLayout(form_layout)
+
+        self.txt_id = QtWidgets.QLineEdit()
+        self.txt_id.setFont(self.mainApp.font_m)
+        self.txt_id.setVisible(False)
+        form_layout.addWidget(self.txt_id)
 
         label_ci = QtWidgets.QLabel("CEDULA:")
         label_ci.setFont(self.mainApp.font_m)
@@ -108,6 +142,14 @@ class Dialog_personal(QtWidgets.QDialog):
         self.txt_pass1.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_pass1, self.register_user , context=QtCore.Qt.WidgetShortcut)
         self.txt_pass1.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_pass1, self.register_user , context=QtCore.Qt.WidgetShortcut)
         form_layout.addRow(label_pass1, self.txt_pass1)
+
+        self.label_pass_current = QtWidgets.QLabel("CONTRASEÑA ACTUAL:")
+        self.label_pass_current.setFont(self.mainApp.font_m)
+
+        self.txt_pass_current = QtWidgets.QLineEdit()
+        self.txt_pass_current.setFont(self.mainApp.font_m)
+        self.txt_pass_current.setEchoMode(QtWidgets.QLineEdit.Password)
+        form_layout.addRow(self.label_pass_current, self.txt_pass_current)
 
         layout_button = QtWidgets.QHBoxLayout()
         main_layout.addLayout(layout_button)

@@ -3,7 +3,6 @@
 <head>
     <style>
         body{
-
             padding: 20px;
         }
 
@@ -20,7 +19,7 @@
         }
 
         .header .header_head p,
-        .header .header_detalle .cliente p{
+        .header .header_detalle .personal p{
             margin: 0;
             font-size: 20px;
         }
@@ -80,7 +79,7 @@
     <div class="header">
         <div class="header_head">
             <div>
-                <h1 class="titulo_factura">FACTURA</h1>
+                <h1 class="titulo_factura">CIERRE DE TURNO</h1>
                 <p>Ferrexito<p>
                 <p>Direccion</p>
             </div>
@@ -91,18 +90,17 @@
         </div>
         <br>
         <div class="header_detalle">
-            <div class="cliente">
-                <h3 class="titulo_factura">FACTURAR A</h3>
-                
-                    <p>27863198</p>
-                
-                <p>LUIS ALBARRACIN</p>
-                <p>MARACAY<p>
+            <div class="personal">
+                <h3 class="titulo_factura">CIERRE DE</h3>
+                {% if ci != "0" %}
+                    <p>{{ci}}</p>
+                {% endif %}
+                <p>{{personal}}</p>
             </div>
 
             <div class="detalle">
-                <b><p><span>NÚMERO FACTURA: </span>00000000001</p></b>
-                <b><p><span>FECHA DE EXPEDICIÓN: </span>03/11/2022 00:33:24</p></b>
+                <b><p><span>NÃšMERO DE CIERRE: </span>{{n_cierre}}</p></b>
+                <b><p><span>FECHA DE EXPEDICIÃ“N: </span>{{fecha_cierre}}</p></b>
             </div>
         </div>
     </div>
@@ -110,46 +108,44 @@
     <table class="styled-table">
         <thead>
             <tr>
-                <th>Producto</th>
-                <th>cantidad</th>
-                <th>costo</th>
-                <th>monto</th>
+                <th>Factura</th>
+                <th>Fecha</th>
+                <th>Subtotal</th>
+                <th>IVA</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
 
-            
+            {% for dict_item in facturas %}
                 <tr>
-                
-                    <td>MARTILLO</td>
-                
-                    <td>5</td>
-                
-                    <td>20,00</td>
-                
-                    <td>100,00</td>
-                
+                {% for key, value in dict_item.items() %}
+                    <td>{{value}}</td>
+                {% endfor %}
                 </tr>
-            
+            {% endfor %}
             <tr>
                 <td></td>
                 <td></td>
-                <td>Subtotal</td>
-                <td>86,21</td>
+                <td></td>
+                <td class="titulo_factura"><b>Subtotal</b></td>
+                <td class="titulo_factura"><b>{{subtotal}}</b></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
-                <td>IVA 16,00%</td>
-                <td>13,79</td>
+                <td></td>
+                <td class="titulo_factura"><b>IVA</b></td>
+                <td class="titulo_factura"><b>{{iva}}</b></td>
             </tr>
 
             <tr>
+                <td><b></b></td>
                 <td></td>
                 <td></td>
-                <td class="titulo_factura"><b>TOTAL</b></td>
-                <td class="titulo_factura"><b>100,00 Bs</b></td>
+                <td class="titulo_factura"><b>Total</b></td>
+                <td class="titulo_factura"><b>{{total}}</b></td>
             </tr>
         </tbody>
     </table>

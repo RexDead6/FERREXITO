@@ -78,6 +78,20 @@ public final class DATA_CLASS {
             return false;
         }
     }
+    
+    public boolean UPDATE_USER(String id, String nombre, String cargo, String clave){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "UPDATE personal SET nombre = '"+nombre+"', cargo = "+cargo+", clave = '"+clave+"' WHERE ID = "+id+";";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return true;
+        }catch(SQLException e){
+            System.out.println("ERROR INSERT_USER: "+e);
+            return false;
+        }
+    }
 
     public String[] SELECT_USER(String ci, String clave){
         try{
@@ -213,10 +227,10 @@ public final class DATA_CLASS {
         }
     }
 
-    public boolean INSERT_PRODUCTO(String codigo, String descripcion, String cantidad_alerta){
+    public boolean INSERT_PRODUCTO(String codigo, String descripcion, String cantidad_min, String cantidad_max){
         try{
             try (Statement stmt = DB.con.createStatement()) {
-                String query = "INSERT INTO producto (codigo, descripcion, cantidad_alerta) VALUES ('"+codigo+"', '"+descripcion+"', "+cantidad_alerta+")";
+                String query = "INSERT INTO producto (codigo, descripcion, cantidad_min, cantidad_max) VALUES ('"+codigo+"', '"+descripcion+"', "+cantidad_min+", "+cantidad_max+")";
                 stmt.executeUpdate(query);
                 DB.con.commit();
             }
@@ -252,13 +266,14 @@ public final class DATA_CLASS {
                 ArrayList<String[]> data_raw = new ArrayList<>();
                 
                 while(rs.next()){
-                    String[] data = new String[6];
+                    String[] data = new String[7];
                     data[0] = rs.getString("ID");
                     data[1] = rs.getString("codigo");
                     data[2] = rs.getString("descripcion");
                     data[3] = rs.getString("existencia");
                     data[4] = rs.getString("costo_venta");
-                    data[5] = rs.getString("cantidad_alerta");
+                    data[5] = rs.getString("cantidad_min");
+                    data[6] = rs.getString("cantidad_max");
                     data_raw.add(data);
                 }
                 return data_raw;
@@ -273,7 +288,7 @@ public final class DATA_CLASS {
         try{
             try (Statement stmt = DB.con.createStatement()){
                 
-                String[] data = new String[6];
+                String[] data = new String[7];
                 
                 String query = "SELECT * FROM producto WHERE ID = "+id+"";
                 ResultSet rs = stmt.executeQuery(query);
@@ -283,7 +298,8 @@ public final class DATA_CLASS {
                 data[2] = rs.getString("descripcion");
                 data[3] = rs.getString("existencia");
                 data[4] = rs.getString("costo_venta");
-                data[5] = rs.getString("cantidad_alerta");
+                data[5] = rs.getString("cantidad_min");
+                data[6] = rs.getString("cantidad_max");
                 
                 return data;
             }
@@ -297,7 +313,7 @@ public final class DATA_CLASS {
         try{
             try (Statement stmt = DB.con.createStatement()){
                 
-                String[] data = new String[6];
+                String[] data = new String[8];
                 
                 String query = "SELECT * FROM producto WHERE codigo = '"+codigo+"'";
                 ResultSet rs = stmt.executeQuery(query);
@@ -307,7 +323,8 @@ public final class DATA_CLASS {
                 data[2] = rs.getString("descripcion");
                 data[3] = rs.getString("existencia");
                 data[4] = rs.getString("costo_venta");
-                data[5] = rs.getString("cantidad_alerta");
+                data[5] = rs.getString("cantidad_min");
+                data[6] = rs.getString("cantidad_max");
                 
                 return data;
             }
@@ -528,52 +545,40 @@ public final class DATA_CLASS {
         }
     }
     
-    public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios, int[] metodo_pago, int[] ref, float[] monto){
-        String referencia = MOVIMIENTO(tipo, entidad, personal, TOTAL_STR, productos, cantidades, precios);
-        if (!"false".equals(referencia)){
-            try{
-                Statement stmt = DB.con.createStatement();
-                ResultSet rs = null;
-                String query = "";
-                
-                query = "SELECT * FROM cuerpo WHERE ID = (SELECT MAX(ID) FROM cuerpo)";
-                rs = stmt.executeQuery(query);
-                int id_cuerpo = rs.getInt("ID");
-            
-                for(int i = 0; i < metodo_pago.length; i++){
-                    query = "INSERT INTO pago (ID_cuerpo, metodo_pago, referencia, monto)"
-                            + "VALUES ("+id_cuerpo+", '"+format_type_meth(metodo_pago[i])+"', '"+ref[i]+"', '"+monto[i]+"');";
-                    stmt.executeUpdate(query);
-                    DB.con.commit();
-                }
-                return referencia;
-            }catch(SQLException e){
-                System.out.println("ERROR IN MOVIMIENTO_PAGO: "+e);
-                return "false";
-            }
-        } else {
-            return "false";
-        }
-    }
-    
-    public ArrayList<String[]> SELECT_VENTA_CIERRE(){
+    public ArrayList<String[]> SELECT_VENTA_CIERRE(String id_cierre){
         try{
             try (Statement stmt = DB.con.createStatement()){
                 
-                String query = "SELECT * FROM venta WHERE estatus = 0 AND cierre = 0";
+                String query = "SELECT \n" +
+                               "       AA.ID,\n" +
+                               "       AA.fecha,\n" +
+                               "       BB.`C.I.`,\n" +
+                               "       BB.nombre,\n" +
+                               "       cc.referencia,\n" +
+                               "       CC.fecha AS fecha_factura, \n" +
+                               "       DD.subtotal AS subtotal_factura,\n" +
+                               "       DD.IVA AS iva_factura,\n" +
+                               "       DD.total AS total_factura\n" +
+                               "FROM cierres AS AA\n" +
+                               "INNER JOIN personal AS BB ON BB.ID = AA.id_personal\n" +
+                               "INNER JOIN venta AS CC ON CC.cierre = AA.ID\n" +
+                               "INNER JOIN cuerpo AS DD ON DD.ID_encabezado = CC.ID\n" +
+                               "WHERE AA.ID = "+id_cierre+";";
                 ResultSet rs = stmt.executeQuery(query);
                 
                 ArrayList<String[]> data_raw = new ArrayList<>();
                 
                 while(rs.next()){
-                    String[] data = new String[7];
+                    String[] data = new String[9];
                     data[0] = rs.getString("ID");
-                    data[1] = rs.getString("estatus");
-                    data[2] = rs.getString("referencia");
-                    data[3] = rs.getString("personal");
-                    data[4] = rs.getString("cliente");
-                    data[5] = rs.getString("fecha");
-                    data[6] = rs.getString("cierre");
+                    data[1] = rs.getString("fecha");
+                    data[2] = rs.getString("C.I.");
+                    data[3] = rs.getString("nombre");
+                    data[4] = rs.getString("referencia");
+                    data[5] = rs.getString("fecha_factura");
+                    data[6] = rs.getString("subtotal_factura");
+                    data[7] = rs.getString("iva_factura");
+                    data[8] = rs.getString("total_factura");
                     data_raw.add(data);
                 }
                 return data_raw;
@@ -588,12 +593,18 @@ public final class DATA_CLASS {
         try{
             int id_cierre = 0;
             try (Statement stmt = DB.con.createStatement()) {
-                String query = "INSERT INTO cierres (id_personal) VALUES ("+id_personal+")";
+                String query = "SELECT COUNT(AA.ID) AS count_data FROM venta AS AA WHERE AA.cierre = 0;";
+                ResultSet rs = stmt.executeQuery(query);
+                if(rs.getInt("count_data") == 0){
+                    return 0;
+                }
+                
+                query = "INSERT INTO cierres (id_personal) VALUES ("+id_personal+")";
                 stmt.executeUpdate(query);
                 DB.con.commit();
                 
                 query = "SELECT * FROM cierres WHERE ID = (SELECT MAX(ID) FROM cierres);";
-                ResultSet rs = stmt.executeQuery(query);
+                rs = stmt.executeQuery(query);
                 id_cierre = rs.getInt("ID");
                 
                 query = "UPDATE venta SET cierre = "+id_cierre+" WHERE estatus = 0 AND cierre = 0";
@@ -626,7 +637,7 @@ public final class DATA_CLASS {
                                "       BB.subtotal,\n" +
                                "       BB.total\n" +
                                "FROM venta AS AA\n" +
-                               "INNER JOIN cuerpo AS BB ON BB.ID_encabezado = AA.ID\n" +
+                               "INNER JOIN cuerpo AS BB ON BB.referencia = AA.referencia\n" +
                                "INNER JOIN cliente AS CC ON AA.cliente = CC.ID\n" +
                                "INNER JOIN cuerpo_productos AS DD ON DD.ID_cuerpo = BB.ID\n" +
                                "INNER JOIN producto AS EE ON DD.ID_producto = EE.ID\n" +
@@ -660,7 +671,39 @@ public final class DATA_CLASS {
         }
     }
     
+    public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios, int[] metodo_pago, int[] ref, float[] monto){
+        String referencia = MOVIMIENTO(tipo, entidad, personal, TOTAL_STR, productos, cantidades, precios);
+        if (!"false".equals(referencia)){
+            try{
+                Statement stmt = DB.con.createStatement();
+                ResultSet rs = null;
+                String query = "";
+                
+                query = "SELECT * FROM cuerpo WHERE ID = (SELECT MAX(ID) FROM cuerpo)";
+                rs = stmt.executeQuery(query);
+                int id_cuerpo = rs.getInt("ID");
+            
+                for(int i = 0; i < metodo_pago.length; i++){
+                    query = "INSERT INTO pago (ID_cuerpo, metodo_pago, referencia, monto)"
+                            + "VALUES ("+id_cuerpo+", '"+format_type_meth(metodo_pago[i])+"', '"+ref[i]+"', '"+monto[i]+"');";
+                    stmt.executeUpdate(query);
+                    DB.con.commit();
+                }
+                return referencia;
+            }catch(SQLException e){
+                System.out.println("ERROR IN MOVIMIENTO_PAGO: "+e);
+                return "false";
+            }
+        } else {
+            return "false";
+        }
+    }
+    
     public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios){
+        return MOVIMIENTO(tipo, entidad, personal, TOTAL_STR, productos, cantidades, precios, "");
+    }
+    
+    public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios, String des){
         try{
             Statement stmt = DB.con.createStatement();
             ResultSet rs = null;
@@ -711,7 +754,7 @@ public final class DATA_CLASS {
                     String id_cliente = rs.getString("cliente");
                     id_entidad = rs.getString("ID");
                     
-                    query = "INSERT INTO devolucion (cliente, personal, ID_venta) VALUES ("+id_cliente+", "+personal+", "+id_entidad+")";
+                    query = "INSERT INTO devolucion (cliente, personal, ID_venta, detalle) VALUES ("+id_cliente+", "+personal+", "+id_entidad+", '"+des+"')";
                     stmt.executeUpdate(query);
                     DB.con.commit();
                     
@@ -904,7 +947,7 @@ public final class DATA_CLASS {
                     data[0] = rs.getString("ID");
                     data[1] = rs.getString("descripcion");
                     data[2] = rs.getString("fecha");
-                    data[3] = rs.getString("cargo");
+                    data[3] = rs.getString("id_personal");
                     data_raw.add(data);
                 }
                 return data_raw;
@@ -936,7 +979,7 @@ public final class DATA_CLASS {
                 ArrayList<String[]> data_raw = new ArrayList<>();
                 
                 while(rs.next()){
-                    String[] data = new String[9];
+                    String[] data = new String[4];
                     data[0] = rs.getString("ID");
                     data[1] = rs.getString("descripcion");
                     data[2] = rs.getString("fecha");

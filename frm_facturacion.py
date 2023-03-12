@@ -5,8 +5,7 @@ from dialogs.dialog_cobranza import Dialog_cobranza
 from dialogs.dialog_registro_cliente import Dialog_cliente
 from dialogs.dialog_consultar import Dialog_consultar
 from dialogs.dialog_auth import Dialog_auth
-
-import class_reports
+from dialogs.dialog_reportView import Dialog_reportView
 
 class Frame_facturacion(QtWidgets.QFrame):
     
@@ -19,7 +18,7 @@ class Frame_facturacion(QtWidgets.QFrame):
         self.mainApp = kwargs['args']
         self.create_widgets()
 
-        self.msg = QMessageBox()
+        self.msgBox = QMessageBox()
 
     def search_cliente(self):
         cliente = self.mainApp.DATA_SYSTEM.SELECT_CLIENTE(self.txt_ci.text())
@@ -105,19 +104,15 @@ class Frame_facturacion(QtWidgets.QFrame):
 
         valueCLicked = self.msg_cierre.exec()
         if valueCLicked == QMessageBox.Ok:
-            ventas = self.mainApp.DATA_SYSTEM.SELECT_VENTA_CIERRE()
-            if len(ventas) <= 0:
-                QMessageBox.critical(self.msg, "::INFORMACION::", "IMPOSIBLE GENERAR CIERRE\nNO SE ENCONTRARON VENTAS EN EL SISTEMA")
+            ventas = self.mainApp.DATA_SYSTEM.UPDATE_VENTA_CIERRE(str(self.mainApp.temp_user))
+            if ventas <= 0:
+                QMessageBox.critical(self.msgBox, "::INFORMACION::", "IMPOSIBLE GENERAR CIERRE\nNO SE ENCONTRARON VENTAS EN EL SISTEMA")
                 return None
 
-            print("temp: {}".format(self.mainApp.temp_user))
-            cierre = self.mainApp.DATA_SYSTEM.UPDATE_VENTA_CIERRE(str(self.mainApp.temp_user))
-
-            if cierre != 0:
-                #class_reports.generarCierrePDF(cierre)
-                QMessageBox.information(self.msg, "::CIERRE::", "CIERRE #{} GENERADO CON ÉXITO".format(cierre))
-            else:
-                QMessageBox.critical(self.msg, "::CIERRE::", "ERROR AL GENERAR EL CIERRE")
+            self.mainApp.reporte_cierre(ventas)
+            self.dialog_report = Dialog_reportView(args=(self.mainApp, f"cierre_#{ventas}.pdf"))
+            self.dialog_report.show()
+            #QMessageBox.information(self.msgBox, "::CIERRE::", "CIERRE #{} GENERADO CON ÉXITO".format(cierre))
     
     def open_generar_cierre(self):
         if self.mainApp.cargo <= 1:

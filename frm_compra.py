@@ -17,6 +17,10 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_barcode.setFocus()
 
     def search_rif(self):
+        if self.txt_ci.text() == "":
+            self.msg.setText("INGRESE EL RIF DE SU PROVEEDOR")
+            return None
+
         proveedor = self.mainApp.DATA_SYSTEM.SELECT_PROVEEDOR(self.txt_ci.text())
 
         if proveedor != None:
@@ -30,6 +34,8 @@ class Frame_compra(QtWidgets.QFrame):
             self.msg.setText("REGISTRAR PROVEEDOR NUEVO")
             self.txt_nombre.setEnabled(True)
             self.txt_nombre.setFocus()
+
+        self.msg.setText("")
 
     def enter_proveedor(self):
         if self.txt_ci.text() == "" or self.txt_nombre.text() == "":
@@ -65,6 +71,9 @@ class Frame_compra(QtWidgets.QFrame):
             self.txt_alerta.setEnabled(True)
             self.txt_alerta.setReadOnly(True)
             self.txt_alerta.setText(self.data[5])
+            self.txt_cantidad_max.setEnabled(True)
+            self.txt_cantidad_max.setReadOnly(True)
+            self.txt_cantidad_max.setText(self.data[6])
             self.txt_costo_venta.setEnabled(True)
             self.txt_costo_venta.setReadOnly(True)
             self.txt_costo_compra.setEnabled(True)
@@ -81,7 +90,19 @@ class Frame_compra(QtWidgets.QFrame):
         if self.txt_alerta.text() == "":
             return None
 
-        success = self.mainApp.DATA_SYSTEM.INSERT_PRODUCTO(self.txt_barcode.text(), self.txt_descripcion.text(), self.txt_alerta.text())
+        self.txt_cantidad_max.setEnabled(True)
+        self.txt_cantidad_max.setFocus()
+
+    def enter_cantidad_max(self):
+        if self.txt_cantidad_max.text() == "":
+            return None
+
+        success = self.mainApp.DATA_SYSTEM.INSERT_PRODUCTO(
+            self.txt_barcode.text(),
+            self.txt_descripcion.text(),
+            self.txt_alerta.text(),
+            self.txt_cantidad_max.text())
+
         if success:
             self.id_prod = self.mainApp.DATA_SYSTEM.SELECT_PRODUCTO(self.txt_barcode.text())[0]
             self.msg.setText("INGRESE EL PRECIO DE COMPRA")
@@ -105,11 +126,18 @@ class Frame_compra(QtWidgets.QFrame):
         if float(self.txt_costo_compra.text().replace(".", "").replace(",", ".")) <= 0.0:
             return None
         
+        '''
         producto = self.mainApp.DATA_SYSTEM.SELECT_PRODUCTO(self.txt_barcode.text())
         self.msg.setText("PRECIO DE VENTA ACTUAL\n{} BsF".format(self.mainApp.formato_moneda(float(producto[4]))))
         self.txt_costo_venta.setReadOnly(False)
         self.txt_costo_venta.setFocus()
         self.txt_costo_compra.setReadOnly(True)
+        '''
+
+        self.txt_cantidad.setEnabled(True)
+        self.txt_cantidad.setFocus()
+        self.txt_costo_compra.setReadOnly(True)
+        self.msg.setText("INGRESE LA CANTIDAD DEL PRODUCTO")
 
     def enter_txt_venta(self):
         if float(self.txt_costo_venta.text().replace(".", "").replace(",", ".")) <= 0.0:
@@ -149,6 +177,7 @@ class Frame_compra(QtWidgets.QFrame):
 
         self.txt_barcode.setText("")
         self.txt_barcode.setEnabled(True)
+        self.txt_barcode.setReadOnly(False)
         self.txt_descripcion.setText("")
         self.txt_descripcion.setReadOnly(False)
         self.txt_descripcion.setEnabled(False)
@@ -164,6 +193,9 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_cantidad.setText("")
         self.txt_cantidad.setReadOnly(False)
         self.txt_cantidad.setEnabled(False)
+        self.txt_cantidad_max.setReadOnly(False)
+        self.txt_cantidad_max.setEnabled(False)
+        self.txt_cantidad_max.setText("")
         self.txt_barcode.setFocus()
 
     def procesar(self):
@@ -317,7 +349,7 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_descripcion.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_descripcion, self.enter_descripcion, context=QtCore.Qt.WidgetShortcut)
         form_facturacion.addRow(label_descripcion, self.txt_descripcion)
 
-        label_alerta = QtWidgets.QLabel("CANTIDAD ALERTA:")
+        label_alerta = QtWidgets.QLabel("STOCK MINIMO:")
         label_alerta.setFont(self.mainApp.font_m)
 
         self.txt_alerta = QtWidgets.QLineEdit()
@@ -326,6 +358,16 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_alerta.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_alerta, self.enter_cantidad_alerta, context=QtCore.Qt.WidgetShortcut)
         self.txt_alerta.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_alerta, self.enter_cantidad_alerta, context=QtCore.Qt.WidgetShortcut)
         form_facturacion.addRow(label_alerta, self.txt_alerta)
+
+        label_cantidad_max = QtWidgets.QLabel("STOCK MAXIMO:")
+        label_cantidad_max.setFont(self.mainApp.font_m)
+
+        self.txt_cantidad_max = QtWidgets.QLineEdit()
+        self.txt_cantidad_max.setFont(self.mainApp.font_m)
+        self.txt_cantidad_max.setEnabled(False)
+        self.txt_cantidad_max.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_cantidad_max, self.enter_cantidad_max, context=QtCore.Qt.WidgetShortcut)
+        self.txt_cantidad_max.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_cantidad_max, self.enter_cantidad_max, context=QtCore.Qt.WidgetShortcut)
+        form_facturacion.addRow(label_cantidad_max, self.txt_cantidad_max)
 
         label_costo_compra = QtWidgets.QLabel("COSTO DE COMPRA:")
         label_costo_compra.setFont(self.mainApp.font_m)

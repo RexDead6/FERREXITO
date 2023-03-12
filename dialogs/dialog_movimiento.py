@@ -49,7 +49,7 @@ class Dialog_movimiento(QtWidgets.QDialog):
             self.txt_ci.setText(cliente[1])
             self.txt_nombre.setText("NOMBRE:")
             self.txt_nombre.setText(cliente[2])
-            self.txt_descripcion.setText("N/A")
+            self.txt_descripcion.setText(data[6])
         self.show()
     
     def fill_table(self, cuerpo_productos):

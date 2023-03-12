@@ -66,6 +66,7 @@ class Tabla_productos(QtWidgets.QFrame):
         self.btn_abrir.setFont(self.mainApp.font_m)
         self.btn_abrir.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_abrir.setMinimumHeight(80)
+        self.btn_abrir.setVisible(False)
         layout_botones.addWidget(self.btn_abrir)
 
         layout_botones.addStretch()
