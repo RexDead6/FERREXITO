@@ -42,7 +42,9 @@ class Dialog_personal(QtWidgets.QDialog):
                 self.txt_pass.setFocus()
                 return None
 
-            if self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text()) != None:
+            USER_DATA = self.mainApp.DATA_SYSTEM.SELECT_USER(self.txt_ci.text())
+            print(USER_DATA)
+            if USER_DATA != None:
                 QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "USUARIO YA HA SIDO REGISTRADO")
                 return None
 

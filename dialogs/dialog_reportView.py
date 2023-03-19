@@ -32,7 +32,7 @@ class Dialog_reportView(QtWidgets.QDialog):
                 caption="Seleccione una carpeta",
                 directory=PATH_TO_INIT
             )
-        pdfkit.from_file("templates/html_temp_report.html", PATH_TO_SAVE+"/"+self.FILE_NAME)
+        pdfkit.from_file("templates/html_temp_report.html", PATH_TO_SAVE+"/"+self.FILE_NAME, options={"enable-local-file-access": ""})
         self.mainApp.DATA_SYSTEM.UPDATE_AJUSTE("path_pdf", PATH_TO_SAVE)
         QMessageBox.information(self.msg, "::REPORTE::", "REPORTE GENERADO CON ÉXITO")
         self.close()

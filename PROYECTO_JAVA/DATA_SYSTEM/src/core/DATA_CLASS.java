@@ -671,6 +671,59 @@ public final class DATA_CLASS {
         }
     }
     
+    public ArrayList<String[]> SELECT_COMPRA(String ref_compra){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT \n" +
+                               "       AA.referencia,\n" +
+                               "       AA.fecha,\n" +
+                               "       CC.RIF,\n" +
+                               "       CC.razon_social,\n" +
+                               "       CC.telefono,\n" +
+                               "       EE.descripcion,\n" +
+                               "       DD.precio_unitario,\n" +
+                               "       DD.cantidad,\n" +
+                               "       DD.precio_total AS precio_producto,\n" +
+                               "       BB.porcent_IVA,\n" +
+                               "       BB.IVA,\n" +
+                               "       BB.subtotal,\n" +
+                               "       BB.total\n" +
+                               "FROM compra AS AA\n" +
+                               "INNER JOIN cuerpo AS BB ON BB.referencia = AA.referencia\n" +
+                               "INNER JOIN proveedor AS CC ON AA.proveedor = CC.ID\n" +
+                               "INNER JOIN cuerpo_productos AS DD ON DD.ID_cuerpo = BB.ID\n" +
+                               "INNER JOIN producto AS EE ON DD.ID_producto = EE.ID\n" +
+                               "WHERE AA.referencia = '"+ref_compra+"'";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[13];
+                    data[0] = rs.getString("referencia");
+                    data[1] = rs.getString("fecha");
+                    data[2] = rs.getString("RIF");
+                    data[3] = rs.getString("razon_social");
+                    data[4] = rs.getString("telefono");
+                    data[5] = rs.getString("descripcion");
+                    data[6] = rs.getString("precio_unitario");
+                    data[7] = rs.getString("cantidad");
+                    data[8] = rs.getString("precio_producto");
+                    data[9] = rs.getString("porcent_IVA");
+                    data[10] = rs.getString("IVA");
+                    data[11] = rs.getString("subtotal");
+                    data[12] = rs.getString("total");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_VENTA_CIERRE: "+e);
+            return null;
+        }
+    }
+    
     public String MOVIMIENTO(int tipo, String entidad, String personal, String TOTAL_STR, int[] productos, int[] cantidades, float[] precios, int[] metodo_pago, int[] ref, float[] monto){
         String referencia = MOVIMIENTO(tipo, entidad, personal, TOTAL_STR, productos, cantidades, precios);
         if (!"false".equals(referencia)){
@@ -1002,7 +1055,7 @@ public final class DATA_CLASS {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         df.setGroupingUsed(false);
-        return df.format(n);
+        return df.format(n).replace(".", "").replace(",", ".");
     }
     
     public String format_type_mov(int mov){

@@ -98,6 +98,37 @@ class windows_main(QtWidgets.QMainWindow):
         return Reports(
         "venta_template.html", 
         data).execute()
+    
+    def reporte_compra(self, num_compra):
+        data_raw = self.DATA_SYSTEM.SELECT_COMPRA(num_compra)
+        data = {
+            "rif": data_raw[0][2],
+            "proveedor": data_raw[0][3],
+            "telefono": data_raw[0][4],
+            "n_factura": data_raw[0][0],
+            "fecha_factura": self.formato_fecha(data_raw[0][1]),
+            "subtotal": self.formato_moneda(float(data_raw[0][11])),
+            "iva_porcent": self.formato_moneda(float(data_raw[0][9])),
+            "iva": self.formato_moneda(float(data_raw[0][10])),
+            "total": self.formato_moneda(float(data_raw[0][12]))
+        }
+
+        productos = list()
+
+        for list_data in data_raw:
+            producto = {
+                "descripcion": list_data[5],
+                "cantidad": list_data[7],
+                "costo": self.formato_moneda(float(list_data[6])),
+                "monto": self.formato_moneda(float(list_data[8]))
+            }
+            productos.append(producto)
+
+        data["productos"] = productos
+        
+        return Reports(
+        "compra_template.html", 
+        data).execute()
         
     def setTempUser(self, id):
         self.temp_user = id

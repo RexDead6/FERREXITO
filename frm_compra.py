@@ -1,7 +1,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 import jpype
 
-from dialogs.dialog_cobranza import Dialog_cobranza
+from dialogs.dialog_reportView import Dialog_reportView
 from class_secundary import lineAmount
 
 class Frame_compra(QtWidgets.QFrame):
@@ -213,13 +213,10 @@ class Frame_compra(QtWidgets.QFrame):
 
         ref = self.mainApp.DATA_SYSTEM.MOVIMIENTO(2, self.txt_ci.text(), self.mainApp.id_user, self.mainApp.frame_compra.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
         if ref != "false":
-            text_data = "{:<25}{:>25}".format("REFERENCIA:", ref)
-            text_data = text_data + "\n{:<25}{:>25}".format("PROVEEDOR:", self.txt_nombre.text())
-            text_data = text_data + "\n{:<25}{:>25}".format("MONTO:", self.txt_total.text()+" Bs")
-            self.dialog = Dialog_cobranza(args=self.mainApp)
-            self.dialog.label_data.setText(text_data)
-            self.dialog.stack.setCurrentIndex(1)
-            self.default_forms()
+            if self.mainApp.reporte_compra(ref):
+                    self.default_forms()
+                    self.dialog_report = Dialog_reportView(args=(self.mainApp, f"compra_{ref}.pdf"))
+                    self.dialog_report.show()
 
     def delete_a_row(self):
         try:
