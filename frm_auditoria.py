@@ -31,14 +31,22 @@ class Tabla_auditoria(QtWidgets.QFrame):
             empleado = self.mainApp.DATA_SYSTEM.SELECT_USER_BY_ID(data[i][3])
 
             if self.txt_buscar.text() != "":
-                if not empleado[1].__contains__(self.txt_buscar().text()) and not empleado[2].lower().__contains__(self.txt_buscar().text().lower()):
+                if not empleado[1].__contains__(self.txt_buscar.text()) and not empleado[2].lower().__contains__(self.txt_buscar.text().lower()):
                     continue
 
+            if self.box_accion.currentIndex() != 0:
+                if not data[i][1].__contains__(self.box_accion.currentText()):
+                    continue
+
+            cargo = "Administrador"
+            if empleado[3] == "1": cargo = "Supervidor"
+            if empleado[3] == "2": cargo = "Operador"
             self.table_auditoria.insertRow(0)
             self.table_auditoria.setItem(0,0, QtWidgets.QTableWidgetItem(empleado[1]))
             self.table_auditoria.setItem(0,1, QtWidgets.QTableWidgetItem(empleado[2]))
-            self.table_auditoria.setItem(0,2, QtWidgets.QTableWidgetItem(data[i][1]))
-            self.table_auditoria.setItem(0,3, QtWidgets.QTableWidgetItem(self.mainApp.formato_fecha(data[i][2])))
+            self.table_auditoria.setItem(0,2, QtWidgets.QTableWidgetItem(cargo))
+            self.table_auditoria.setItem(0,3, QtWidgets.QTableWidgetItem(data[i][1]))
+            self.table_auditoria.setItem(0,4, QtWidgets.QTableWidgetItem(self.mainApp.formato_fecha(data[i][2])))
 
         self.table_auditoria.resizeRowsToContents()
         self.table_auditoria.resizeColumnsToContents()
@@ -57,8 +65,8 @@ class Tabla_auditoria(QtWidgets.QFrame):
 
         self.table_auditoria = QtWidgets.QTableWidget()
         self.table_auditoria.setFont(self.mainApp.font_m)
-        self.table_auditoria.setColumnCount(4)
-        self.table_auditoria.setHorizontalHeaderLabels(['CEDULA', 'NOMBRE', 'DESCRIPCION', 'FECHA'])
+        self.table_auditoria.setColumnCount(5)
+        self.table_auditoria.setHorizontalHeaderLabels(['CEDULA', 'NOMBRE', 'CARGO','DESCRIPCION', 'FECHA'])
         self.table_auditoria.resizeColumnsToContents()
         self.table_auditoria.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_auditoria)
@@ -72,14 +80,19 @@ class Tabla_auditoria(QtWidgets.QFrame):
         
         self.txt_buscar = QtWidgets.QLineEdit()
         self.txt_buscar.setFont(self.mainApp.font_m)
-        self.txt_buscar.setMaximumWidth(200)
+        self.txt_buscar.setMaximumWidth(330)
         self.txt_buscar.textChanged.connect(self.buscar)
         layout_botones.addWidget(self.txt_buscar)
 
         self.box_accion = QtWidgets.QComboBox()
         self.box_accion.addItem("SIN ESPECIFICAR")
+        self.box_accion.addItem("COMPRA DE PRODUCTOS")
+        self.box_accion.addItem("VENTA DE PRODUCTOS")
+        self.box_accion.addItem("DEVOLUCIÓN DE PRODUCTOS")
+        self.box_accion.addItem("AJUSTES DE INVENTARIO(-)")
+        self.box_accion.addItem("AJUSTES DE INVENTARIO(+)")
         self.box_accion.setFont(self.mainApp.font_m)
-        self.box_accion.setMaximumWidth(200)
+        self.box_accion.setMaximumWidth(330)
         #self.box_accion.currentIndexChanged.connect(self.onCurrentIndexComboTipo)
         layout_botones.addWidget(self.box_accion)
 

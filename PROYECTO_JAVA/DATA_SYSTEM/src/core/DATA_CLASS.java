@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * CLASS TO MAKE A BRIGE BETWEEN DATA BASE AND PYTHON SYSTEM
@@ -20,6 +21,119 @@ public final class DATA_CLASS {
     
     public DATA_CLASS(){
         //MOVIMIENTO(1, 1, 1, "1000.00");
+    }
+    
+    public ArrayList<String[]> SELECT_PRODUCTO_POR_DIA(String id_producto){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT \n" +
+                               "    CC.fecha,\n" +
+                               "    BB.cantidad\n" +
+                               "FROM cuerpo AS AA\n" +
+                               "INNER JOIN cuerpo_productos AS BB ON AA.ID = BB.ID_cuerpo\n" +
+                               "INNER JOIN venta AS CC ON AA.referencia = CC.referencia\n" +
+                               "WHERE BB.ID_producto = "+id_producto;
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[4];
+                    data[0] = rs.getString("fecha");
+                    data[1] = rs.getString("cantidad");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_ALL_PREGUNTAS: "+e);
+            return null;
+        }
+    }
+    
+    public boolean INSERT_RESPUESTA(String respuesta, String pregunta, String ci){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "SELECT ID FROM personal WHERE `C.I.` = '"+ci+"';";
+                ResultSet rs = stmt.executeQuery(query);
+                String id_personal = rs.getString("ID");
+                
+                query = "INSERT INTO respuestas_seguridad (pregunta, respuesta, id_personal) VALUES ('"+pregunta+"', '"+respuesta+"', "+id_personal+");";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return true;
+        }catch(SQLException e){
+            System.out.println("ERROR INSERT_RESPUESTA: "+e);
+            return false;
+        }
+    }
+    
+    public ArrayList<String[]> SELECT_PREGUNTAS(){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT * FROM preguntas_seguridad;";
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[4];
+                    data[0] = rs.getString("ID");
+                    data[1] = rs.getString("pregunta");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_ALL_PREGUNTAS: "+e);
+            return null;
+        }
+    }
+    
+    public String[] SELECT_RESPUESTAS(String ci){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                
+                String query = "SELECT ID FROM personal WHERE `C.I.` = '"+ci+"';";
+                ResultSet rs = stmt.executeQuery(query);
+                String id_personal = rs.getString("ID");
+                
+                query = "SELECT * FROM respuestas_seguridad WHERE id_personal = "+id_personal+";";
+                rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data1 = new String[4];
+                    data1[0] = rs.getString("pregunta");
+                    data1[1] = rs.getString("respuesta");
+                    data1[2] = rs.getString("id_personal");
+                    data.add(data1);
+                }
+                
+                return data.get(new Random().nextInt(data.size()));
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR SELECT_USER: "+e);
+            return null;
+        }
+    }
+    
+    public boolean UPDATE_CLAVE_USER(String ci, String clave){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "UPDATE personal SET clave = '"+clave+"' WHERE `C.I.` = '"+ci+"';";
+                stmt.executeUpdate(query);
+                DB.con.commit();
+            }
+            return true;
+        }catch(SQLException e){
+            System.out.println("ERROR INSERT_USER: "+e);
+            return false;
+        }
     }
     
     public String SELECT_AJUSTE(String clave){

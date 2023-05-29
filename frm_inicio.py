@@ -25,7 +25,8 @@ class Frame_inicio(QtWidgets.QFrame):
             self.table_productos.setItem(0,2, QtWidgets.QTableWidgetItem(data[i][2]))
             self.table_productos.setItem(0,3, QtWidgets.QTableWidgetItem(data[i][3]))
             self.table_productos.setItem(0,4, QtWidgets.QTableWidgetItem(data[i][5]))
-            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(data[i][4]))))
+            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(data[i][6]))
+            self.table_productos.setItem(0,6, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(data[i][4]))))
 
     def create_widgets(self):
         layout_main = QtWidgets.QVBoxLayout()
@@ -46,8 +47,8 @@ class Frame_inicio(QtWidgets.QFrame):
 
         self.table_productos = QtWidgets.QTableWidget()
         self.table_productos.setFont(self.mainApp.font_m)
-        self.table_productos.setColumnCount(6)
-        self.table_productos.setHorizontalHeaderLabels(['ID', 'CÓDIGO', 'NOMBRE', 'EXISTENCIA', 'ALERTA', 'PRECIO'])
+        self.table_productos.setColumnCount(7)
+        self.table_productos.setHorizontalHeaderLabels(['ID', 'CÓDIGO', 'NOMBRE', 'EXISTENCIA', 'STOCK MINIMO', 'STOCK MAXIMO','PRECIO'])
         self.table_productos.resizeColumnsToContents()
         self.table_productos.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_productos)

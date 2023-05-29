@@ -30,7 +30,7 @@ class Dialog_personal(QtWidgets.QDialog):
             self.txt_pass_current.setVisible(False)
 
     def register_user(self):
-        if self.txt_ci.text() == "" or self.box_cargo.currentIndex() == 0 or self.txt_nombre.text() == "" or self.txt_pass.text() == "" or self.txt_pass1.text() == "":
+        if self.txt_ci.text() == "" or self.box_cargo.currentIndex() == 0 or self.txt_nombre.text() == "" or self.txt_pass.text() == "" or self.txt_pass1.text() == "" or self.box_pregunta1.currentIndex() == 0 or self.box_pregunta2.currentIndex() == 0 or self.box_pregunta3.currentIndex() == 0 or self.txt_respuesta1.text() == "" or self.txt_respuesta2.text() == "" or self.txt_respuesta3.text() == "":
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "RELLENE TODOS LOS FORMULARIOS")
             return None
         
@@ -50,6 +50,9 @@ class Dialog_personal(QtWidgets.QDialog):
 
             SUCCESS = self.mainApp.DATA_SYSTEM.INSERT_USER(self.txt_ci.text(), self.txt_nombre.text(), self.box_cargo.currentIndex(), self.txt_pass.text())
             if SUCCESS:
+                self.mainApp.DATA_SYSTEM.INSERT_RESPUESTA(self.txt_respuesta1.text(), self.box_pregunta1.currentText(), self.txt_ci.text())
+                self.mainApp.DATA_SYSTEM.INSERT_RESPUESTA(self.txt_respuesta2.text(), self.box_pregunta2.currentText(), self.txt_ci.text())
+                self.mainApp.DATA_SYSTEM.INSERT_RESPUESTA(self.txt_respuesta3.text(), self.box_pregunta3.currentText(), self.txt_ci.text())
                 QMessageBox.information(self.msgBox, "::: OPERACIÓN EXITOSA :::", "USUARIO REGISTRADO EXITOSAMENTE")
                 self.mainApp.frame_personal.add_data_table()
                 self.close()
@@ -75,7 +78,6 @@ class Dialog_personal(QtWidgets.QDialog):
                 self.close()
             else:
                 QMessageBox.Critical(self.msgBox, "::: ATENCIÓN :::", "ERROR AL ACTUALIZAR USUARIO, INTENTE DE NUEVO")
-
 
     def create_widgets(self):
         self.setModal(True)
@@ -141,8 +143,8 @@ class Dialog_personal(QtWidgets.QDialog):
         self.txt_pass1 = QtWidgets.QLineEdit()
         self.txt_pass1.setFont(self.mainApp.font_m)
         self.txt_pass1.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.txt_pass1.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_pass1, self.register_user , context=QtCore.Qt.WidgetShortcut)
-        self.txt_pass1.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_pass1, self.register_user , context=QtCore.Qt.WidgetShortcut)
+        self.txt_pass1.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_pass1, lambda: self.box_pregunta1.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.txt_pass1.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_pass1, lambda: self.box_pregunta1.setFocus() , context=QtCore.Qt.WidgetShortcut)
         form_layout.addRow(label_pass1, self.txt_pass1)
 
         self.label_pass_current = QtWidgets.QLabel("CONTRASEÑA ACTUAL:")
@@ -156,6 +158,74 @@ class Dialog_personal(QtWidgets.QDialog):
         layout_button = QtWidgets.QHBoxLayout()
         main_layout.addLayout(layout_button)
         main_layout.setAlignment(layout_button, QtCore.Qt.AlignHCenter)
+
+        label_pregunta1 =  QtWidgets.QLabel("PREGUNTA SEGURIDAD 1:")
+        label_pregunta1.setFont(self.mainApp.font_m)
+
+        preguntas = self.mainApp.DATA_SYSTEM.SELECT_PREGUNTAS();
+
+        self.box_pregunta1 = QtWidgets.QComboBox()
+        self.box_pregunta1.addItem("---SELECCIONE---")
+        self.box_pregunta1.addItem(preguntas[0][1])
+        self.box_pregunta1.addItem(preguntas[1][1])
+        self.box_pregunta1.addItem(preguntas[2][1])
+        self.box_pregunta1.setFont(self.mainApp.font_m)
+        self.box_pregunta1.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.box_pregunta1, lambda: self.txt_respuesta1.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.box_pregunta1.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.box_pregunta1, lambda: self.txt_respuesta1.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_pregunta1, self.box_pregunta1)
+
+        label_respuesta1 =  QtWidgets.QLabel("RESPUESTA SEGURIDAD 1:")
+        label_respuesta1.setFont(self.mainApp.font_m)
+
+        self.txt_respuesta1 = QtWidgets.QLineEdit()
+        self.txt_respuesta1.setFont(self.mainApp.font_m)
+        self.txt_respuesta1.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_respuesta1, lambda: self.box_pregunta2.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.txt_respuesta1.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_respuesta1, lambda: self.box_pregunta2.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_respuesta1, self.txt_respuesta1)
+
+        label_pregunta2 =  QtWidgets.QLabel("PREGUNTA SEGURIDAD 2:")
+        label_pregunta2.setFont(self.mainApp.font_m)
+
+        self.box_pregunta2 = QtWidgets.QComboBox()
+        self.box_pregunta2.addItem("---SELECCIONE---")
+        self.box_pregunta2.addItem(preguntas[3][1])
+        self.box_pregunta2.addItem(preguntas[4][1])
+        self.box_pregunta2.addItem(preguntas[5][1])
+        self.box_pregunta2.setFont(self.mainApp.font_m)
+        self.box_pregunta2.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.box_pregunta2, lambda: self.txt_respuesta2.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.box_pregunta2.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.box_pregunta2, lambda: self.txt_respuesta2.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_pregunta2, self.box_pregunta2)
+
+        label_respuesta2 =  QtWidgets.QLabel("RESPUESTA SEGURIDAD 2:")
+        label_respuesta2.setFont(self.mainApp.font_m)
+
+        self.txt_respuesta2 = QtWidgets.QLineEdit()
+        self.txt_respuesta2.setFont(self.mainApp.font_m)
+        self.txt_respuesta2.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_respuesta2, lambda: self.box_pregunta3.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.txt_respuesta2.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_respuesta2, lambda: self.box_pregunta3.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_respuesta2, self.txt_respuesta2)
+
+        label_pregunta3 =  QtWidgets.QLabel("PREGUNTA SEGURIDAD 3:")
+        label_pregunta3.setFont(self.mainApp.font_m)
+
+        self.box_pregunta3 = QtWidgets.QComboBox()
+        self.box_pregunta3.addItem("---SELECCIONE---")
+        self.box_pregunta3.addItem(preguntas[6][1])
+        self.box_pregunta3.addItem(preguntas[7][1])
+        self.box_pregunta3.addItem(preguntas[8][1])
+        self.box_pregunta3.setFont(self.mainApp.font_m)
+        self.box_pregunta3.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.box_cargo, lambda: self.txt_respuesta3.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        self.box_pregunta3.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.box_cargo, lambda: self.txt_respuesta3.setFocus() , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_pregunta3, self.box_pregunta3)
+
+        label_respuesta3 =  QtWidgets.QLabel("RESPUESTA SEGURIDAD 3:")
+        label_respuesta3.setFont(self.mainApp.font_m)
+
+        self.txt_respuesta3 = QtWidgets.QLineEdit()
+        self.txt_respuesta3.setFont(self.mainApp.font_m)
+        self.txt_respuesta3.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_respuesta3, lambda: self.register_user , context=QtCore.Qt.WidgetShortcut)
+        self.txt_respuesta3.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_respuesta3, lambda: self.register_user , context=QtCore.Qt.WidgetShortcut)
+        form_layout.addRow(label_respuesta3, self.txt_respuesta3)
 
         self.btn_aceptar = QtWidgets.QPushButton("ACEPTAR")
         self.btn_aceptar.setFont(self.mainApp.font_m)

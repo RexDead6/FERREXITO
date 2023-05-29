@@ -1,4 +1,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5.QtGui import QBrush, QColor
+
+from dialogs.dialog_producto_grafico import Dialog_producto_grafico
 
 class Tabla_productos(QtWidgets.QFrame):
 
@@ -22,16 +25,28 @@ class Tabla_productos(QtWidgets.QFrame):
 
         self.table_productos.setRowCount(0)
         for i in range(len(data)):
+
+            existencia_item = QtWidgets.QTableWidgetItem(data[i][3])
+            if int(data[i][3]) < int(data[i][5]): existencia_item.setForeground(QBrush(QColor(220, 0, 0)))
+            if int(data[i][3]) > int(data[i][6]): existencia_item.setForeground(QBrush(QColor(0, 220, 0)))
+
             self.table_productos.insertRow(0)
             self.table_productos.setItem(0,0, QtWidgets.QTableWidgetItem(data[i][0]))
             self.table_productos.setItem(0,1, QtWidgets.QTableWidgetItem(data[i][1]))
             self.table_productos.setItem(0,2, QtWidgets.QTableWidgetItem(data[i][2]))
-            self.table_productos.setItem(0,3, QtWidgets.QTableWidgetItem(data[i][3]))
+            self.table_productos.setItem(0,3, existencia_item)
             self.table_productos.setItem(0,4, QtWidgets.QTableWidgetItem(data[i][5]))
-            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(data[i][4]))))
+            self.table_productos.setItem(0,5, QtWidgets.QTableWidgetItem(data[i][6]))
+            self.table_productos.setItem(0,6, QtWidgets.QTableWidgetItem(self.mainApp.formato_moneda(float(data[i][4]))))
 
         self.table_productos.resizeRowsToContents()
         self.table_productos.resizeColumnsToContents()
+
+    def btn_grafico(self):
+        if self.table_productos.selectionModel().hasSelection():
+            row  = self.table_productos.currentRow()
+            id   = self.table_productos.item(row, 0).text()
+            self.dialog = Dialog_producto_grafico(args=[self.mainApp, id])
 
     def create_widgets(self):
         layout_main = QtWidgets.QVBoxLayout()
@@ -47,8 +62,8 @@ class Tabla_productos(QtWidgets.QFrame):
 
         self.table_productos = QtWidgets.QTableWidget()
         self.table_productos.setFont(self.mainApp.font_m)
-        self.table_productos.setColumnCount(6)
-        self.table_productos.setHorizontalHeaderLabels(['ID', 'CÓDIGO', 'NOMBRE', 'EXISTENCIA', 'ALERTA', 'PRECIO'])
+        self.table_productos.setColumnCount(7)
+        self.table_productos.setHorizontalHeaderLabels(['ID', 'CÓDIGO', 'NOMBRE', 'EXISTENCIA', 'STOCK MINIMO', 'STOCK MAXIMO','PRECIO'])
         self.table_productos.resizeColumnsToContents()
         self.table_productos.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout_horizontal.addWidget(self.table_productos)
@@ -62,11 +77,11 @@ class Tabla_productos(QtWidgets.QFrame):
         self.txt_buscar.textChanged.connect(self.input_buscar)
         layout_botones.addWidget(self.txt_buscar)
 
-        self.btn_abrir = QtWidgets.QPushButton("ABRIR")
+        self.btn_abrir = QtWidgets.QPushButton("GRAFICO")
         self.btn_abrir.setFont(self.mainApp.font_m)
         self.btn_abrir.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
         self.btn_abrir.setMinimumHeight(80)
-        self.btn_abrir.setVisible(False)
+        self.btn_abrir.clicked.connect(self.btn_grafico)
         layout_botones.addWidget(self.btn_abrir)
 
         layout_botones.addStretch()

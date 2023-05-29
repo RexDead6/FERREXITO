@@ -1,5 +1,7 @@
 from PyQt5 import QtGui, QtCore, QtWidgets
 
+from dialogs.dialog_clave_forgot import Dialog_clave_forgot
+
 class Frame_login(QtWidgets.QFrame):
 
     mainApp = None
@@ -24,6 +26,13 @@ class Frame_login(QtWidgets.QFrame):
         self.mainApp.id_user = data[0]
         self.mainApp.cargo   = int(data[3])
 
+        cargo_n = "Administrador"
+        if data[3] == "1": cargo_n = "Supervisor"
+        if data[3] == "2": cargo_n = "Operador"
+
+        self.mainApp.label_user.setVisible(True)
+        self.mainApp.label_user.setText("{} - {}".format(data[2], cargo_n))
+
         self.mainApp.action_compra.setVisible(True)
         self.mainApp.logistica_menu.setEnabled(True)
         self.mainApp.action_empleados.setVisible(True)
@@ -43,6 +52,9 @@ class Frame_login(QtWidgets.QFrame):
             self.mainApp.change_frame("inicio")
         else:
             self.mainApp.change_frame("venta")
+
+    def olvide_clave(self):
+        self.dialog = Dialog_clave_forgot(args=self.mainApp)
 
     def create_widgets(self):
         self.setStyleSheet("QFrame{background-color: #C6C38B; margin:0}")
@@ -94,3 +106,8 @@ class Frame_login(QtWidgets.QFrame):
         self.btn_ini.setFont(self.mainApp.font_m)
         self.btn_ini.clicked.connect(self.iniciar_sesion)
         layout_frame.addWidget(self.btn_ini)
+
+        self.label_pass = QtWidgets.QPushButton("¿Has olvidado tu contraseña?")
+        self.label_pass.setFont(self.mainApp.font_m)
+        self.label_pass.clicked.connect(self.olvide_clave)
+        layout_frame.addWidget(self.label_pass)

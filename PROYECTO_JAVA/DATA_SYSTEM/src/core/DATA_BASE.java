@@ -71,6 +71,8 @@ public final class DATA_BASE {
             rs = stmt.executeQuery("SELECT * FROM venta;");
             rs = stmt.executeQuery("SELECT * FROM auditoria;");
             rs = stmt.executeQuery("SELECT * FROM cierres;");
+            rs = stmt.executeQuery("SELECT * FROM preguntas_seguridad;");
+            rs = stmt.executeQuery("SELECT * FROM respuestas_seguridad;");
 
         } catch (SQLException ex) {
             if (ex.toString().substring(74, 87).equals("no such table")) {
@@ -203,7 +205,23 @@ public final class DATA_BASE {
                     + "CREATE TABLE `cierres`(\n"
                     + "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + "   `fecha` DATETIME DEFAULT CURRENT_TIMESTAMP,\n"
-                    + "   `id_personal` INTEGER NOT NULL);";
+                    + "   `id_personal` INTEGER NOT NULL);\n"
+                    + "CREATE TABLE `preguntas_seguridad`(\n"
+                    + "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
+                    + "   `pregunta` VARCHAR(250) NOT NULL);\n"
+                    + "CREATE TABLE `respuestas_seguridad`("
+                    + "   `pregunta` VARCHAR(250) NOT NULL,"
+                    + "   `respuesta` VARCHAR(100) NOT NULL,"
+                    + "   `id_personal` INT(11) NOT NULL);"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Primer nombre de su madre?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Ciudad de Nacimiento?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Fecha de nacimiento de su padre?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Lugar que le gustaria visitar?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Comida favorita?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Segundo nombre de su hermano/a?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Materia favorita del bachillerato?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Nombre de su segunda mascota?');\n"
+                    + "INSERT INTO preguntas_seguridad (pregunta) VALUES ('¿Ciudad de nacimiento de su abuela?');\n";
 
             System.out.println(sql);
             stmt.executeUpdate(sql);

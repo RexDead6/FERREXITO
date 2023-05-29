@@ -188,6 +188,7 @@ class windows_main(QtWidgets.QMainWindow):
             self.menubar.setVisible(False)
             self.frame_login.txt_user.setFocus()
             self.setWindowTitle("INICIAR SESION")
+            self.label_user.setVisible(False)
         elif f == "inventario":
             self.stack.setCurrentIndex(7)
             self.setWindowTitle("AJUSTE DE INVENTARIO - {}".format(self.nombre))
@@ -215,7 +216,7 @@ class windows_main(QtWidgets.QMainWindow):
         self.font_p.setPointSize(10)
 
         self.font_m = QtGui.QFont()
-        self.font_m.setPointSize(15)
+        self.font_m.setPointSize(13)
 
         self.font_g = QtGui.QFont()
         self.font_g.setBold(True)
@@ -246,6 +247,14 @@ class windows_main(QtWidgets.QMainWindow):
         self.stack.addWidget(self.frame_auditoria)          # 8
         self.stack.addWidget(self.frame_inicio)             # 9
         layout_main.addWidget(self.stack)
+
+        # BORRA INFORMATIVA INFERIOR
+        layout_inferior = QtWidgets.QHBoxLayout()
+        layout_main.addLayout(layout_inferior)
+        self.label_user = QtWidgets.QLabel()
+        self.label_user.setFont(self.font_g)
+        self.label_user.setVisible(False)
+        layout_inferior.addWidget(self.label_user)
 
         # MENU BAR
         self.menubar = QtWidgets.QMenuBar(self)
