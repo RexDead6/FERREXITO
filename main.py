@@ -32,7 +32,6 @@ class windows_main(QtWidgets.QMainWindow):
     def reporte_cierre(self, num_cierre):
         data_raw = self.DATA_SYSTEM.SELECT_VENTA_CIERRE(str(num_cierre))
 
-        print(f"data_raw: {data_raw}")
         data = {
             "ci":data_raw[0][2],
             "personal":data_raw[0][3],
@@ -110,7 +109,8 @@ class windows_main(QtWidgets.QMainWindow):
             "subtotal": self.formato_moneda(float(data_raw[0][11])),
             "iva_porcent": self.formato_moneda(float(data_raw[0][9])),
             "iva": self.formato_moneda(float(data_raw[0][10])),
-            "total": self.formato_moneda(float(data_raw[0][12]))
+            "total": self.formato_moneda(float(data_raw[0][12])),
+            "factura_compra": data_raw[0][13]
         }
 
         productos = list()

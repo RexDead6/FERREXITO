@@ -26,10 +26,10 @@ class Frame_compra(QtWidgets.QFrame):
         if proveedor != None:
             self.txt_nombre.setEnabled(True)
             self.txt_nombre.setText(proveedor[2])
-            self.txt_ci.setReadOnly(True)
             self.txt_nombre.setReadOnly(True)
-            self.txt_barcode.setEnabled(True)
-            self.txt_barcode.setFocus()
+            self.msg.setText("INGRESE LA FACTURA DE VENTA")
+            self.txt_factura.setEnabled(True)
+            self.txt_factura.setFocus()
         else:
             self.msg.setText("REGISTRAR PROVEEDOR NUEVO")
             self.txt_nombre.setEnabled(True)
@@ -44,14 +44,23 @@ class Frame_compra(QtWidgets.QFrame):
         
         success = self.mainApp.DATA_SYSTEM.INSERT_PROVEEDOR(self.txt_ci.text(), self.txt_nombre.text(), "00000000000")
         if success:
-            msg = "INGRESE UN PRODUCTO"
-            self.txt_barcode.setEnabled(True)
-            self.txt_ci.setReadOnly(True)
-            self.txt_nombre.setReadOnly(True)
-            self.txt_barcode.setFocus()
+            msg = "INGRESE LA FACTURA DE VENTA"
+            self.txt_factura.setEnabled(True)
+            self.txt_factura.setFocus()
+            
         else:
             msg = "ERROR AL REGISTRAR, INTENTE DE NUEVO"
         self.msg.setText(msg)
+
+    def enter_factura(self):
+        if self.txt_factura.text() == "":
+            self.msg.setText("RELLENE LA FACTURA DE VENTA")
+            return None
+        
+        self.txt_barcode.setEnabled(True)
+        self.txt_ci.setReadOnly(True)
+        self.txt_nombre.setReadOnly(True)
+        self.txt_barcode.setFocus()
 
     def search_barcode(self):
         if self.txt_barcode.text() == "":
@@ -211,7 +220,7 @@ class Frame_compra(QtWidgets.QFrame):
             precio[i]    = float(self.table_productos.item(i, 3).text().replace(".", "").replace(",", "."))
             self.mainApp.DATA_SYSTEM.UPDATE_PRODUCTO(self.table_productos.item(i, 0).text(), "costo_venta", self.table_productos.item(i, 4).text().replace(".", "").replace(",", "."))
 
-        ref = self.mainApp.DATA_SYSTEM.MOVIMIENTO(2, self.txt_ci.text(), self.mainApp.id_user, self.mainApp.frame_compra.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio)
+        ref = self.mainApp.DATA_SYSTEM.MOVIMIENTO(2, self.txt_ci.text(), self.mainApp.id_user, self.mainApp.frame_compra.txt_total.text().replace(".", "").replace(",", "."), productos, cantidad, precio, self.txt_factura.text())
         if ref != "false":
             if self.mainApp.reporte_compra(ref):
                     self.default_forms()
@@ -234,6 +243,8 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_nombre.setText("")
         self.txt_nombre.setReadOnly(False)
         self.txt_nombre.setEnabled(False)
+        self.txt_factura.setText("")
+        self.txt_factura.setEnabled(False)
         self.txt_barcode.setText("")
         self.txt_barcode.setReadOnly(False)
         self.txt_barcode.setEnabled(False)
@@ -325,6 +336,16 @@ class Frame_compra(QtWidgets.QFrame):
         self.txt_nombre.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_nombre, self.enter_proveedor, context=QtCore.Qt.WidgetShortcut)
         self.txt_nombre.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_nombre, self.enter_proveedor, context=QtCore.Qt.WidgetShortcut)
         form_facturacion.addRow(label_nombre, self.txt_nombre)
+
+        label_factura = QtWidgets.QLabel("FACTURA DE COMPRA:")
+        label_factura.setFont(self.mainApp.font_m)
+
+        self.txt_factura =QtWidgets.QLineEdit()
+        self.txt_factura.setFont(self.mainApp.font_m)
+        self.txt_factura.setEnabled(False)
+        self.txt_factura.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_factura, self.enter_factura, context=QtCore.Qt.WidgetShortcut)
+        self.txt_factura.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_factura, self.enter_factura, context=QtCore.Qt.WidgetShortcut)
+        form_facturacion.addRow(label_factura, self.txt_factura)
 
         label_barcode = QtWidgets.QLabel("CÓDIGO DE BARRA:")
         label_barcode.setFont(self.mainApp.font_m)

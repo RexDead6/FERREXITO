@@ -9,7 +9,6 @@ class Dialog_movimiento(QtWidgets.QDialog):
         super(Dialog_movimiento, self).__init__()
         self.mainApp = mainApp
         self.create_widgets()
-
     
     def setData(self, tipo, ref):
         data = self.mainApp.DATA_SYSTEM.SELECT_CABECERA(tipo, ref)
@@ -36,7 +35,8 @@ class Dialog_movimiento(QtWidgets.QDialog):
             self.txt_ci.setText(proveedor[1])
             self.label_nombre.setText("RAZÓN SOCIAL:")
             self.txt_nombre.setText(proveedor[2])
-            self.txt_descripcion.setText("N/A")
+            self.label_descripcion.setText("NÚMERO FACTURA:")
+            self.txt_descripcion.setText(data[10])
         elif tipo == "inventario":
             self.label_ci.setText("CEDULA:")
             self.txt_ci.setText("N/A")

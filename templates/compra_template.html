@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <style>
-        body{
+        body {
 
             padding: 20px;
         }
 
-        .titulo_factura{
+        .titulo_factura {
             color: brown;
         }
 
-        .image_logo{
+        .image_logo {
             position: absolute;
             max-width: 100px;
             height: auto;
@@ -20,23 +21,24 @@
         }
 
         .header .header_head p,
-        .header .header_detalle .cliente p{
+        .header .header_detalle .cliente p {
             margin: 0;
             font-size: 20px;
         }
-    
-        .header .header_detalle{
-            display: -webkit-box; /* wkhtmltopdf uses this one */
+
+        .header .header_detalle {
+            display: -webkit-box;
+            /* wkhtmltopdf uses this one */
             display: flex;
         }
-        
-        .header .header_detalle .detalle{
+
+        .header .header_detalle .detalle {
             position: absolute;
             top: 140px;
             right: 20px;
         }
 
-        .header .header_detalle .detalle span{
+        .header .header_detalle .detalle span {
             color: brown;
             font-size: 18px;
         }
@@ -76,12 +78,14 @@
         }
     </style>
 </head>
+
 <body>
     <div class="header">
         <div class="header_head">
             <div>
                 <h1 class="titulo_factura">Nota de Entrega</h1>
-                <p>Ferrexito<p>
+                <p>Ferrexito
+                <p>
                 <p>Palo Negro</p>
             </div>
 
@@ -98,8 +102,15 @@
             </div>
 
             <div class="detalle">
-                <b><p><span>NÚMERO: </span>{{n_factura}}</p></b>
-                <b><p><span>FECHA DE EXPEDICIÓN: </span>{{fecha_factura}}</p></b>
+                <b>
+                    <p><span>NÚMERO: </span>{{n_factura}}</p>
+                </b>
+                <b>
+                    <p><span>FECHA DE EXPEDICIÓN: </span>{{fecha_factura}}</p>
+                </b>
+                <b>
+                    <p><span>NÚMERO DE FACTURA: </span>{{factura_compra}}</p>
+                </b>
             </div>
         </div>
     </div>
@@ -116,11 +127,11 @@
         <tbody>
 
             {% for dict_item in productos %}
-                <tr>
+            <tr>
                 {% for key, value in dict_item.items() %}
-                    <td>{{value}}</td>
+                <td>{{value}}</td>
                 {% endfor %}
-                </tr>
+            </tr>
             {% endfor %}
             <tr>
                 <td></td>
@@ -145,4 +156,5 @@
         </tbody>
     </table>
 </body>
+
 </html>

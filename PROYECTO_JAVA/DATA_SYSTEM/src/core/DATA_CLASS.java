@@ -597,6 +597,9 @@ public final class DATA_CLASS {
                 try{
                     data[9] = rs.getString("cliente");
                 }catch(Exception e){}
+                try{
+                    data[10] = rs.getString("factura");
+                }catch(Exception e){}
                 return data;
             }
         }catch(SQLException e){
@@ -790,6 +793,7 @@ public final class DATA_CLASS {
             try (Statement stmt = DB.con.createStatement()){
                 
                 String query = "SELECT \n" +
+                               "       AA.factura," +
                                "       AA.referencia,\n" +
                                "       AA.fecha,\n" +
                                "       CC.RIF,\n" +
@@ -814,7 +818,7 @@ public final class DATA_CLASS {
                 ArrayList<String[]> data_raw = new ArrayList<>();
                 
                 while(rs.next()){
-                    String[] data = new String[13];
+                    String[] data = new String[14];
                     data[0] = rs.getString("referencia");
                     data[1] = rs.getString("fecha");
                     data[2] = rs.getString("RIF");
@@ -828,6 +832,7 @@ public final class DATA_CLASS {
                     data[10] = rs.getString("IVA");
                     data[11] = rs.getString("subtotal");
                     data[12] = rs.getString("total");
+                    data[13] = rs.getString("factura");
                     data_raw.add(data);
                 }
                 return data_raw;
@@ -904,7 +909,7 @@ public final class DATA_CLASS {
                     rs = stmt.executeQuery(query);
                     id_entidad = rs.getString("ID");
                                         
-                    query = "INSERT INTO compra (proveedor, personal) VALUES ("+id_entidad+", "+personal+");";
+                    query = "INSERT INTO compra (proveedor, personal, factura) VALUES ("+id_entidad+", "+personal+", "+des+");";
                     stmt.executeUpdate(query);
                     DB.con.commit();
                     
