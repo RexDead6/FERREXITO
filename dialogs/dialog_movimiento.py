@@ -1,5 +1,4 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from pip import main
 
 class Dialog_movimiento(QtWidgets.QDialog):
 

@@ -20,6 +20,9 @@ class Dialog_ajustes(QtWidgets.QDialog):
         aumento = float(self.mainApp.DATA_SYSTEM.SELECT_AJUSTE("AUMENTO_VENTA"))
         self.txt_aumento.setValue(aumento)
 
+        tasa = float(self.mainApp.DATA_SYSTEM.SELECT_AJUSTE("tasa"))
+        self.txt_tasa.setValue(tasa)
+
     def guardar_admin(self):
         if self.txt_ci.text() == "" or self.txt_clave.text() == "" or self.txt_clave1.text() == "":
             QMessageBox.critical(self.msgBox, "::: ATENCIÓN :::", "RELLENE TODOS LOS FORMULARIOS")
@@ -123,6 +126,14 @@ class Dialog_ajustes(QtWidgets.QDialog):
         self.txt_aumento.setDecimals(2)
         self.txt_aumento.setFont(self.mainApp.font_m)
         form_ajuste.addRow(label_aumento, self.txt_aumento)
+
+        label_tasa = QtWidgets.QLabel("TASA DEL DOLAR:")
+        label_tasa.setFont(self.mainApp.font_m)
+        
+        self.txt_tasa = QtWidgets.QDoubleSpinBox()
+        self.txt_tasa.setDecimals(2)
+        self.txt_tasa.setFont(self.mainApp.font_m)
+        form_ajuste.addRow(label_tasa, self.txt_tasa)
 
         self.btn_guardar_valores = QtWidgets.QPushButton("GUARDAR VALORES")
         self.btn_guardar_valores.setFont(self.mainApp.font_m)

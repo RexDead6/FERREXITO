@@ -608,6 +608,42 @@ public final class DATA_CLASS {
         }
     }
     
+    public ArrayList<String[]> SELECT_MOVIMIENTO_PRODUCTO(String id_producto){
+        try{
+            try (Statement stmt = DB.con.createStatement()){
+                String query = "SELECT\n" +
+                               "      AA.referencia,\n" +
+                               "      AA.tipo,\n" +
+                               "      BB.precio_unitario,\n" +
+                               "      BB.cantidad,\n" +
+                               "      BB.precio_total,\n" +
+                               "      DD.fecha\n" +
+                               "FROM cuerpo AS AA \n" +
+                               "INNER JOIN cuerpo_productos AS BB ON AA.ID = BB.ID_cuerpo\n" +
+                               "INNER JOIN compra AS DD ON AA.ID_encabezado = DD.ID\n" +
+                               "WHERE BB.ID_producto = "+id_producto;
+                ResultSet rs = stmt.executeQuery(query);
+                
+                ArrayList<String[]> data_raw = new ArrayList<>();
+                
+                while(rs.next()){
+                    String[] data = new String[6];
+                    data[0] = rs.getString("referencia");
+                    data[1] = rs.getString("tipo");
+                    data[2] = rs.getString("precio_unitario");
+                    data[3] = rs.getString("cantidad");
+                    data[4] = rs.getString("precio_total");
+                    data[5]  = rs.getString("fecha");
+                    data_raw.add(data);
+                }
+                return data_raw;
+            }
+        }catch(SQLException e){
+            System.out.println("ERROR IN SELECT_MOVIMIENTO_PRODUCTO: "+e);
+            return null;
+        }
+    }
+    
     public String[] SELECT_MOVIMIENTO(String ref){
         try{
             try (Statement stmt = DB.con.createStatement()){

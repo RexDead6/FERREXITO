@@ -198,6 +198,7 @@ public final class DATA_BASE {
                     + "INSERT INTO ajustes (clave, valor) VALUES ('IVA', '16');\n"
                     + "INSERT INTO ajustes (clave, valor) VALUES ('AUMENTO_VENTA', '45');\n"
                     + "INSERT INTO ajustes (clave, valor) VALUES ('path_pdf', 'reportes');\n"
+                    + "INSERT INTO ajustes (clave, valor) VALUES ('tasa', '27.95');\n"
                     + "CREATE TABLE `auditoria` (\n"
                     + "   `ID` INTEGER PRIMARY KEY AUTOINCREMENT,\n"
                     + "   `descripcion` VARCHAR(50) NOT NULL DEFAULT '',\n"

@@ -7,6 +7,8 @@ from dialogs.dialog_reportView import Dialog_reportView
 class Dialog_cobranza(QtWidgets.QDialog):
 
     TOTAL_PAGAR = 0.0
+    DOLLAR_MODE = False
+    TASA = 27.5
 
     def __init__(self, *args, **kwargs):
         super(Dialog_cobranza, self).__init__()
@@ -17,18 +19,29 @@ class Dialog_cobranza(QtWidgets.QDialog):
         self.TOTAL_PAGAR = float(total.replace(".", "").replace(",", "."))
 
     def set_metodo(self, metodo):
+        self.label_ref.setVisible(True)
         self.txt_ref.setText("")
         self.txt_ref.setEnabled(False)
+        self.txt_ref.setVisible(True)
         self.txt_monto.setText("")
         self.txt_monto.setEnabled(False)
         self.combo_metodo.setCurrentIndex(metodo)
-        if metodo > 0:
-            self.txt_ref.setEnabled(True)
-            self.txt_ref.setFocus()
-        else:
+        self.label_divisa.setVisible(False)
+        self.txt_divisa.setVisible(False)
+        self.DOLLAR_MODE = False
+        if metodo == 0:
             self.txt_monto.setEnabled(True)
             self.txt_monto.setText("{:.2f}".format(self.TOTAL_PAGAR))
             self.txt_monto.setFocus()
+        elif metodo == 3:
+            self.label_ref.setVisible(False)
+            self.txt_ref.setVisible(False)
+            self.label_divisa.setVisible(True)
+            self.txt_divisa.setVisible(True)
+            self.txt_divisa.setFocus()
+        else:
+            self.txt_ref.setEnabled(True)
+            self.txt_ref.setFocus()
 
     def enter_referencia(self):
         self.txt_monto.setEnabled(True)
@@ -91,6 +104,10 @@ class Dialog_cobranza(QtWidgets.QDialog):
             self.txt_ref.setText("")
             self.txt_ref.setEnabled(False)
 
+    def input_txt_divisa(self):
+        divisa = float(self.txt_divisa.text().replace(".", "").replace(",", "."))
+        self.txt_monto.setText("{:,.2f}".format(divisa * self.TASA))
+
     def input_txt_monto(self):
         txt = self.txt_monto.text()[:len(self.txt_monto.text())-2].replace(".", "").replace(",", "")
         total = str(self.TOTAL_PAGAR).replace(".", "").replace(",", "")
@@ -150,12 +167,13 @@ class Dialog_cobranza(QtWidgets.QDialog):
         self.combo_metodo.addItem("EFECTIVO")
         self.combo_metodo.addItem("DEBITO")
         self.combo_metodo.addItem("CREDITO")
+        self.combo_metodo.addItem("DIVISA")
         self.combo_metodo.setFont(self.mainApp.font_m)
         layout_forms.addWidget(self.combo_metodo, 1, 0)
 
-        label_ref = QtWidgets.QLabel("REFERENCIA:")
-        label_ref.setFont(self.mainApp.font_m)
-        layout_forms.addWidget(label_ref, 0, 1)
+        self.label_ref = QtWidgets.QLabel("REFERENCIA:")
+        self.label_ref.setFont(self.mainApp.font_m)
+        layout_forms.addWidget(self.label_ref, 0, 1)
 
         self.txt_ref = QtWidgets.QLineEdit()
         self.txt_ref.setFont(self.mainApp.font_m)
@@ -164,9 +182,21 @@ class Dialog_cobranza(QtWidgets.QDialog):
         self.txt_ref.setEnabled(False)
         layout_forms.addWidget(self.txt_ref, 1, 1)
 
+        self.label_divisa = QtWidgets.QLabel("DIVISA:")
+        self.label_divisa.setFont(self.mainApp.font_m)
+        layout_forms.addWidget(self.label_divisa, 0, 2)
+
+        self.txt_divisa = lineAmount()
+        self.txt_divisa.setFont(self.mainApp.font_m)
+        self.txt_divisa.setVisible(False)
+        self.txt_divisa.textChanged.connect(self.input_txt_divisa)
+        self.txt_divisa.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_divisa, self.enter_monto, context=QtCore.Qt.WidgetShortcut)
+        self.txt_divisa.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_divisa, self.enter_monto , context=QtCore.Qt.WidgetShortcut)
+        layout_forms.addWidget(self.txt_divisa, 1, 2)
+
         label_monto = QtWidgets.QLabel("MONTO:")
         label_monto.setFont(self.mainApp.font_m)
-        layout_forms.addWidget(label_monto, 0, 2)
+        layout_forms.addWidget(label_monto, 0, 3)
 
         self.txt_monto = lineAmount()
         self.txt_monto.setFont(self.mainApp.font_m)
@@ -174,7 +204,7 @@ class Dialog_cobranza(QtWidgets.QDialog):
         self.txt_monto.textChanged.connect(self.input_txt_monto)
         self.txt_monto.enter_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Enter'), self.txt_monto, self.enter_monto, context=QtCore.Qt.WidgetShortcut)
         self.txt_monto.return_short_cut = QtWidgets.QShortcut(QtGui.QKeySequence('Return'), self.txt_monto, self.enter_monto , context=QtCore.Qt.WidgetShortcut)
-        layout_forms.addWidget(self.txt_monto, 1, 2)
+        layout_forms.addWidget(self.txt_monto, 1, 3)
 
         layout_btn = QtWidgets.QVBoxLayout()
         layout_table_h.addLayout(layout_btn)
@@ -201,6 +231,14 @@ class Dialog_cobranza(QtWidgets.QDialog):
         self.btn_credito.setMinimumHeight(80)
         self.btn_credito.setMinimumWidth(160)
         self.btn_credito.clicked.connect(lambda: self.set_metodo(2))
+        layout_btn.addWidget(self.btn_credito)
+
+        self.btn_credito = QtWidgets.QPushButton("DIVISA (F4)")
+        self.btn_credito.setFont(self.mainApp.font_m)
+        self.btn_credito.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.btn_credito.setMinimumHeight(80)
+        self.btn_credito.setMinimumWidth(160)
+        self.btn_credito.clicked.connect(lambda: self.set_metodo(3))
         layout_btn.addWidget(self.btn_credito)
 
         #--------------------- FRAME INFO ----------------------

@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtGui import QBrush, QColor
 
 from dialogs.dialog_producto_grafico import Dialog_producto_grafico
+from dialogs.dialog_movimiento_producto import Dialog_movimiento_producto
 
 class Tabla_productos(QtWidgets.QFrame):
 
@@ -48,6 +49,12 @@ class Tabla_productos(QtWidgets.QFrame):
             id   = self.table_productos.item(row, 0).text()
             self.dialog = Dialog_producto_grafico(args=[self.mainApp, id])
 
+    def btn_table_producto(self):
+        if self.table_productos.selectionModel().hasSelection():
+            row  = self.table_productos.currentRow()
+            self.dialog = Dialog_movimiento_producto(self.mainApp, self.table_productos.item(row, 0).text())
+            self.dialog.show()
+
     def create_widgets(self):
         layout_main = QtWidgets.QVBoxLayout()
         self.setLayout(layout_main)
@@ -83,5 +90,12 @@ class Tabla_productos(QtWidgets.QFrame):
         self.btn_abrir.setMinimumHeight(80)
         self.btn_abrir.clicked.connect(self.btn_grafico)
         layout_botones.addWidget(self.btn_abrir)
+
+        self.btn_table_product = QtWidgets.QPushButton("MOVIMIENTOS")
+        self.btn_table_product.setFont(self.mainApp.font_m)
+        self.btn_table_product.setFocusPolicy(QtCore.Qt.FocusPolicy.NoFocus)
+        self.btn_table_product.setMinimumHeight(80)
+        self.btn_table_product.clicked.connect(self.btn_table_producto)
+        layout_botones.addWidget(self.btn_table_product)
 
         layout_botones.addStretch()

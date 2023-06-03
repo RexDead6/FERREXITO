@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <style>
-        body {
+        body{
 
             padding: 20px;
         }
 
-        .titulo_factura {
+        .titulo_factura{
             color: brown;
         }
 
-        .image_logo {
+        .image_logo{
             position: absolute;
             max-width: 100px;
             height: auto;
@@ -21,24 +20,23 @@
         }
 
         .header .header_head p,
-        .header .header_detalle .cliente p {
+        .header .header_detalle .cliente p{
             margin: 0;
             font-size: 20px;
         }
-
-        .header .header_detalle {
-            display: -webkit-box;
-            /* wkhtmltopdf uses this one */
+    
+        .header .header_detalle{
+            display: -webkit-box; /* wkhtmltopdf uses this one */
             display: flex;
         }
-
-        .header .header_detalle .detalle {
+        
+        .header .header_detalle .detalle{
             position: absolute;
             top: 140px;
             right: 20px;
         }
 
-        .header .header_detalle .detalle span {
+        .header .header_detalle .detalle span{
             color: brown;
             font-size: 18px;
         }
@@ -78,14 +76,12 @@
         }
     </style>
 </head>
-
 <body>
     <div class="header">
         <div class="header_head">
             <div>
-                <h1 class="titulo_factura">Nota de Entrega</h1>
-                <p>Ferrexito
-                <p>
+                <h1 class="titulo_factura">FACTURA</h1>
+                <p>Ferrexito<p>
                 <p>Palo Negro</p>
             </div>
 
@@ -96,21 +92,17 @@
         <br>
         <div class="header_detalle">
             <div class="cliente">
-                <h3 class="titulo_factura">PROVEEDOR:</h3>
-                <p>27863198</p>
-                <p>razon social </p>
+                <h3 class="titulo_factura">FACTURAR A</h3>
+                
+                    <p>27863198</p>
+                
+                <p>LUIS ALBA</p>
+                <p>MARACAY<p>
             </div>
 
             <div class="detalle">
-                <b>
-                    <p><span>NÚMERO: </span>00000000003</p>
-                </b>
-                <b>
-                    <p><span>FECHA DE EXPEDICIÓN: </span>30/05/2023 01:22:42</p>
-                </b>
-                <b>
-                    <p><span>NÚMERO DE FACTURA: </span>5648</p>
-                </b>
+                <b><p><span>NÚMERO FACTURA: </span>00000000005</p></b>
+                <b><p><span>FECHA DE EXPEDICIÓN: </span>01/06/2023 14:49:47</p></b>
             </div>
         </div>
     </div>
@@ -127,40 +119,39 @@
         <tbody>
 
             
-            <tr>
+                <tr>
                 
-                <td>MARTILLO</td>
+                    <td>MARTILLO</td>
                 
-                <td>30</td>
+                    <td>5</td>
                 
-                <td>20,00</td>
+                    <td>29,00</td>
                 
-                <td>600,00</td>
+                    <td>145,00</td>
                 
-            </tr>
+                </tr>
             
             <tr>
                 <td></td>
                 <td></td>
                 <td>Subtotal</td>
-                <td>517,24</td>
+                <td>125,00</td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td>IVA 16,00%</td>
-                <td>82,76</td>
+                <td>20,00</td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
                 <td class="titulo_factura"><b>TOTAL</b></td>
-                <td class="titulo_factura"><b>600,00 Bs</b></td>
+                <td class="titulo_factura"><b>145,00 Bs</b></td>
             </tr>
         </tbody>
     </table>
 </body>
-
 </html>
